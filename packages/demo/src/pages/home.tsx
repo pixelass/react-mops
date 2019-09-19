@@ -57,10 +57,10 @@ const toGrid = ({x = 1, y = 1}) => ({position, size}, model = position) => {
 };
 
 export function Home() {
-	const rotatableRef = React.useRef<HTMLDivElement>();
-	const resizableRef = React.useRef<HTMLDivElement>();
-	const allRef = React.useRef<HTMLDivElement>();
-	const draggableRef = React.useRef<HTMLDivElement>();
+	const rotatableRef = React.useRef<HTMLElement>();
+	const resizableRef = React.useRef<HTMLElement>();
+	const allRef = React.useRef<HTMLElement>();
+	const draggableRef = React.useRef<HTMLElement>();
 	const [windowPointer, setWindowPointer] = React.useState({
 		clientX: 0,
 		clientY: 0
@@ -103,7 +103,7 @@ export function Home() {
 					<p><code>Shift</code> to retain the aspect-ratio</p>
 					<p><code>Alt + Shift</code> to resize in opposite directions and retain the aspect-ratio</p>
 					<Box
-						ref={resizableRef as React.Ref<HTMLDivElement>}
+						ref={resizableRef as React.Ref<HTMLElement>}
 						isResizable
 						onResizeEnd={() => {
 							document.body.classList.remove(
@@ -149,7 +149,7 @@ export function Home() {
 					<p><code>CMD</code> to rotate</p>
 					<p><code>CMD + Shift</code> to rotate in steps</p>
 					<Box
-						ref={rotatableRef as React.Ref<HTMLDivElement>}
+						ref={rotatableRef as React.Ref<HTMLElement>}
 						isRotatable
 						onRotateEnd={() => {
 							document.body.classList.remove(
@@ -193,7 +193,7 @@ export function Home() {
 				<Wrapper>
 					<h3>Draggable</h3>
 					<Box
-						ref={draggableRef as React.Ref<HTMLDivElement>}
+						ref={draggableRef as React.Ref<HTMLElement>}
 						shouldSnap={[
 							// toGrid({x: 25, y: 25}),
 							// toBounds({top: 0, right: 500, bottom: 500, left: 0})
@@ -218,7 +218,7 @@ export function Home() {
 					<p><code>Shift</code> to retain the aspect-ratio</p>
 					<p><code>Alt + Shift</code> to resize in opposite directions and retain the aspect-ratio</p>
 					<Box
-						ref={allRef as React.Ref<HTMLDivElement>}
+						ref={allRef as React.Ref<HTMLElement>}
 						isRotatable
 						isResizable
 						isDraggable

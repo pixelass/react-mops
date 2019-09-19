@@ -33,7 +33,7 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 		},
 		ref
 	) => {
-		const contentRef = ref || React.useRef<HTMLElement>();
+		const contentRef = React.useRef<HTMLDivElement>();
 		const [loaded, setLoaded] = React.useState(false);
 		const [initialSize, setInitialSize] = React.useState<Mops.SizeModel>(
 			props.size as Mops.SizeModel
@@ -611,15 +611,15 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 		};
 		return (
 			<Wrapper
-				ref={contentRef as React.RefObject<HTMLDivElement>}
+				ref={ref as React.Ref<HTMLDivElement>}
 				as={props.as}
 				style={style}
 				isDown={isDown}>
-				{props.isDraggable ? (
-					<Content onMouseDown={!metaKey ? setDown : undefined}>{props.children}</Content>
-				) : (
-					props.children
-				)}
+				<Content
+					ref={contentRef as React.Ref<HTMLDivElement>}
+					onMouseDown={!metaKey && props.isDraggable ? setDown : undefined}>
+					{props.children}
+				</Content>
 				{(props.isResizable || props.isRotatable) && (
 					<Handles>
 						<HandleTop
