@@ -1,116 +1,54 @@
-# M.O.P.S.
-**M**odify **O**rientation **P**osition **S**ize
+> **M**odify **O**rientation **P**osition **S**ize
 
-<!-- toc -->
+# M.O.P.S
 
-- [Value Proposition](#value-proposition)
-- [Features](#features)
-- [Installation](#installation)
-- [Docs](#docs)
-  * [Basic Examples](#basic-examples)
-- [Demo](#demo)
-  * [Live](#live)
-  * [Screen recorings](#screen-recorings)
+[![MIT license][license-badge]][license]
+[![Code of Conduct][coc-badge]][coc]
 
-<!-- tocstop -->
+[![Build status][build-badge]][build]
+[![Test Coverage][codecov-badge]][codecov]
+[![Code Quality][codeclimate-badge]][codeclimate]
+[![Vulnerabilities][snyk-badge]][snyk]
 
-## Value Proposition
+This is the contributor documentation for the `react-mops` mono-repository.
+For user docs see [packages/react-mops][react-mops]
 
-M.O.P.S aims to provide a component that allows various transformations
-to an Element as seen in design software like Photoshop, Sketch any many others.
+## Contribute to M.O.P.S
 
-## Features
+Please read our [contributing guide][contribute]
 
-**(implemented / planned)**
-
-* [ ] `<Guides/>` component
-* [x] Resize
-  * [x] Alt key: resize left/right, top/bottom or all directions for corners
-  * [x] Shift key: retain aspect-ratio
-  * [ ] Snapping
-  * [ ] Touch support
-* [x] Rotate
-  * [x] Meta key: activate rotation
-  * [x] Shift key: rotate in steps of 15 deg
-  * [ ] Snapping
-  * [ ] Touch support
-* [x] Drag
-  * [x] Snapping
-  * [ ] Touch support
-
-## Installation
-
-**NPM**
-
-```shell
-npm install react-mops --save-dev
+```sh
+git clone https://github.com/dekk-app/react-mops.git
+cd react-mops
+yarn
+yarn dev
 ```
 
-**Yarn**
+## License
 
-```shell
-yarn add react-mops
-```
+Copyright by [Gregor Adams][pixelass]. All packages are released under the [MIT license][license].
 
-## Docs
+<!-- User support -->
 
-This an extracted component.
+[site]: https://react-mops.netlify.com
+[react-mops]:https://github.com/dekk-app/react-mops/tree/master/packages/react-mops
 
-Tests and documentation has not been written **yet**. Please look at the [examples](https://github.com/dekk-app/react-mops/blob/master/packages/demo/src/pages/home.tsx#L99) for now 
+<!-- Badges -->
 
-### Basic Examples
+[license-badge]: https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge
+[license]: https://raw.githubusercontent.com/dekk-app/react-mops/master/LICENSE
+[build-badge]: https://img.shields.io/travis/dekk-app/react-mops/master.svg?style=for-the-badge&logo=travis&logoColor=white
+[build]: https://travis-ci.org/dekk-app/react-mops
+[codecov-badge]: https://img.shields.io/codecov/c/github/dekk-app/react-mops.svg?style=for-the-badge&logo=codecov&logoColor=white
+[codecov]: https://codecov.io/gh/dekk-app/react-mops
+[codeclimate-badge]: https://img.shields.io/codeclimate/maintainability/dekk-app/react-mops.svg?style=for-the-badge
+[codeclimate]: https://codeclimate.com/github/dekk-app/react-mops/
+[snyk-badge]: https://img.shields.io/snyk/vulnerabilities/github/dekk-app/react-mops.svg?style=for-the-badge
+[snyk]: https://snyk.io/test/github/dekk-app/react-mops
+[coc-badge]: https://img.shields.io/badge/code%20of-conduct-FF5722.svg?style=for-the-badge
+[coc]: https://github.com/dekk-app/react-mops/blob/master/.github/CODE_OF_CONDUCT.md
 
-```jsx
-import {Box} from "react-mops";
+<!-- Misc Links -->
 
-const wrapperStyle = {
-    position "relative"
-    height: 500,
-    width: 500,
-    boxShadow: "0 0 0 1px black"
-};
-const App = () => {
-    return (
-        <div style={wrapperStyle}>
-            <Box isResizable>
-                Resize me!
-            </Box>
-            <Box isRotatable>
-                Rotate me!
-            </Box>
-            <Box isDraggable>
-                Drag me!
-            </Box>
-            <Box isResizable isRotatable isDraggable>
-                I can do it all!
-            </Box>
-        </div>
-    );
-}
-```
-
-
-## Demo
-
-### Live
-
-[https://react-mops.netlify.com](https://react-mops.netlify.com)
-
-### Screen recorings
-
-**Resizable**
-
-![resizable](https://dekk-app.github.io/react-mops/mops_resizable.gif)
-
-**Rotatable**
-
-![rotatable](https://dekk-app.github.io/react-mops/mops_rotatable.gif)
-
-**Draggable**
-
-![draggable](https://dekk-app.github.io/react-mops/mops_draggable.gif)
-
-**Combined**
-
-![combined](https://dekk-app.github.io/react-mops/mops_combined.gif)
-
+[contribute]: https://github.com/dekk-app/react-mops/blob/master/.github/CONTRIBUTING.md
+[pixelass]: mailto:greg@pixelass.com
