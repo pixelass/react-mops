@@ -146,7 +146,6 @@ export function Home() {
 				</Wrapper>
 				<Wrapper>
 					<h3>Rotatable</h3>
-					<h3>All combined</h3>
 					<p><code>CMD</code> to rotate</p>
 					<p><code>CMD + Shift</code> to rotate in steps</p>
 					<Box
