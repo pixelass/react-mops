@@ -52,8 +52,9 @@
     "predev": "ngineer clean",
     "dev": "ngineer --rollup --watch",
     "test": "ngineer test",
-    "prewatch": "ngineer clean",
-    "watch": "ngineer --rollup --watch"
+    "prerelease": "yarn build",
+    "watch": "ngineer --rollup --watch",
+    "prewatch": "ngineer clean"
   },
   "dependencies": {
     "@types/react": "16.9.2",
@@ -74,7 +75,6 @@
     "react": ">=16.9.0"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.yarnpkg.com"
+    "access": "public"
   }
 }
