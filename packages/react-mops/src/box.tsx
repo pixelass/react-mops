@@ -453,7 +453,7 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 					const {left, top, width, height} = (contentRef as React.RefObject<
 						HTMLElement
 					>).current.getBoundingClientRect();
-					const pointer = {x: event.pageX - left, y: event.pageY - top};
+					const pointer = {x: event.clientX - left, y: event.clientY - top};
 					const center = {x: width / 2, y: height / 2};
 					const deg = coordinatesToDeg(pointer, center);
 					const newRotationZ = to360(initialRotation.z + (deg - additionalAngle.z));
@@ -471,11 +471,11 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 					return;
 				}
 				if (contentRef && (contentRef as React.RefObject<HTMLElement>).current) {
-					const {pageX, pageY} = event;
+					const {clientX, clientY} = event;
 					const {left, top, width, height} = (contentRef as React.RefObject<
 						HTMLElement
 					>).current.getBoundingClientRect();
-					const pointer = {x: pageX - left, y: pageY - top};
+					const pointer = {x: clientX - left, y: clientY - top};
 					const center = {x: width / 2, y: height / 2};
 					const deg = coordinatesToDeg(pointer, center);
 					const newRotationZ = to360(initialRotation.z + (deg - additionalAngle.z));
@@ -492,11 +492,11 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 					return;
 				}
 				if (contentRef && (contentRef as React.RefObject<HTMLElement>).current) {
-					const {pageX, pageY} = event;
+					const {clientX, clientY} = event;
 					const {left, top, width, height} = (contentRef as React.RefObject<
 						HTMLElement
 					>).current.getBoundingClientRect();
-					const pointer = {x: pageX - left, y: pageY - top};
+					const pointer = {x: clientX - left, y: clientY - top};
 					const center = {x: width / 2, y: height / 2};
 					const deg = coordinatesToDeg(pointer, center);
 					const newRotation = (state: Mops.RotationModel) => ({

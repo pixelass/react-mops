@@ -106,7 +106,7 @@ export const getRotation = (
 	}
 ) => {
 	const {left, top, width, height} = node.getBoundingClientRect();
-	const pointer = {x: event.pageX - left, y: event.pageY - top};
+	const pointer = {x: event.clientX - left, y: event.clientY - top};
 	const center = {x: width / 2, y: height / 2};
 	const deg = coordinatesToDeg(pointer, center);
 	return {
