@@ -1,0 +1,52 @@
+{
+  "name": "demo",
+  "version": "0.1.0",
+  "description": "Created with create-ngineer-app",
+  "repository": "git@github.com:pixelass/demo.git",
+  "license": "MIT",
+  "author": "Gregor Adams <greg@pixelass.com>",
+  "main": "server.js",
+  "scripts": {
+    "prebuild": "yarn clean && ngineer -p",
+    "build": "ngineer build -p",
+    "clean": "ngineer clean",
+    "predev": "yarn clean && ngineer",
+    "dev": "concurrently 'ngineer -w' 'ngineer dev-server'",
+    "lint": "ngineer lint 'src/**/*.{ts,tsx,css}'",
+    "serve:public": "serve public",
+    "prestart": "yarn build",
+    "start": "yarn serve:public"
+  },
+  "browserslist": [
+    "last 2 chrome versions",
+    "last 2 firefox versions",
+    "last 2 safari versions",
+    "last 2 ios versions"
+  ],
+  "dependencies": {
+    "@ngineer/head": "1.3.1",
+    "react-mops": "0.0.0",
+    "@types/react": "16.9.2",
+    "@types/react-dom": "16.9.0",
+    "@types/react-hot-loader": "4.1.0",
+    "@types/react-router": "5.0.3",
+    "@types/react-router-dom": "4.3.5",
+    "@types/styled-components": "4.1.19",
+    "html-react-parser": "0.9.1",
+    "react": "16.9.0",
+    "react-dom": "16.9.0",
+    "react-hot-loader": "4.12.12",
+    "react-router": "5.0.1",
+    "react-router-dom": "5.0.1",
+    "styled-components": "4.3.2"
+  },
+  "devDependencies": {
+    "@ngineer/cli": "1.3.1",
+    "@ngineer/configs": "1.3.1",
+    "concurrently": "4.1.2",
+    "html-webpack-plugin": "4.0.0-beta.8",
+    "json-server": "0.15.1",
+    "serve": "11.1.0",
+    "webpack-merge": "4.2.2"
+  }
+}

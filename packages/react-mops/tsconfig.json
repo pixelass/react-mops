@@ -1,0 +1,7 @@
+{
+  "extends": "@ngineer/config-typescript/react",
+  "compilerOptions": {
+    "rootDir": "",
+    "outDir": "dist"
+  }
+}

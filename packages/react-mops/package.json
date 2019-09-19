@@ -1,0 +1,82 @@
+{
+  "name": "react-mops",
+  "version": "0.0.0",
+  "description": "Modify Orientation Position Size",
+  "private": true,
+  "keywords": [
+    "coordinates",
+    "dimesion",
+    "drag",
+    "draggable",
+    "edit",
+    "editor",
+    "move",
+    "movable",
+    "orientation",
+    "position",
+    "resize",
+    "resizable",
+    "rotate",
+    "rotatable",
+    "size",
+    "styled-components",
+    "transform"
+  ],
+  "homepage": "https://github.com/dekk-app/react-mops#readme",
+  "bugs": {
+    "url": "https://github.com/dekk-app/react-mops/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dekk-app/react-mops.git"
+  },
+  "license": "MIT",
+  "author": "Gregor Adams <greg@pixelass.com>",
+  "files": [
+    "dist",
+    "index.js",
+    "index.d.ts"
+  ],
+  "main": "index.js",
+  "module": "dist/esm/index.js",
+  "types": "index.d.ts",
+  "directories": {
+    "lib": "dist",
+    "doc": "doc",
+    "test": "test"
+  },
+  "scripts": {
+    "prebuild": "ngineer clean",
+    "build": "ngineer --rollup --prod",
+    "clean": "ngineer clean",
+    "predev": "ngineer clean",
+    "dev": "ngineer --rollup --watch",
+    "test": "ngineer test",
+    "prewatch": "ngineer clean",
+    "watch": "ngineer --rollup --watch"
+  },
+  "dependencies": {
+    "@types/react": "16.9.2",
+    "@types/styled-components": "4.1.19",
+    "ts-lib": "0.0.5"
+  },
+  "devDependencies": {
+    "@ngineer/cli": "1.3.1",
+    "@ngineer/configs": "1.3.1",
+    "@ngineer/testing-utils": "1.3.1",
+    "@types/react-dom": "16.9.0",
+    "react": "16.9.0",
+    "react-dom": "16.9.0",
+    "rollup-plugin-url": "2.2.2",
+    "ts-node": "8.3.0",
+    "typescript": "3.6.2"
+  },
+  "peerDependencies": {
+    "react": ">=16.9.0",
+    "styled-components": ">=4.3.2"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.yarnpkg.com"
+  }
+}

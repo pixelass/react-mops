@@ -1,0 +1,34 @@
+{
+  "name": "react-mops",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OS X UI elements for React.js",
+  "repository": "git@github.com:dekk-app/react-mops.git",
+  "license": "MIT",
+  "author": "Gregor Adams <greg@pixelass.com>",
+  "main": "index.js",
+  "scripts": {
+    "dev": "lerna run dev --parallel",
+    "build": "lerna run build --stream"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "concurrently": "4.1.2",
+    "lerna": "3.16.4",
+    "npm-check-updates": "3.1.22",
+    "prettier": "1.18.2",
+    "sort-package-json": "1.22.1"
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  },
+  "renovate": {
+    "automerge": true,
+    "major": {
+      "automerge": false
+    }
+  }
+}

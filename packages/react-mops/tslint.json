@@ -1,0 +1,3 @@
+{
+  "extends": ["@ngineer/config-tslint"]
+}
