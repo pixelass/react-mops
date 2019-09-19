@@ -92,6 +92,10 @@ const App = () => {
 
 ## Demo
 
+### Code Sandbox
+
+https://codesandbox.io/s/react-mops-4cwhx
+
 ### Live
 
 [https://react-mops.netlify.com](https://react-mops.netlify.com)
