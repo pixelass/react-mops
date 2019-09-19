@@ -10,7 +10,7 @@
   * [Basic Examples](#basic-examples)
 - [Demo](#demo)
   * [Live](#live)
-  * [Screen recorings](#screen-recorings)
+  * [Screen recordings](#screen-recordings)
 
 <!-- tocstop -->
 
@@ -96,7 +96,7 @@ const App = () => {
 
 [https://react-mops.netlify.com](https://react-mops.netlify.com)
 
-### Screen recorings
+### Screen recordings
 
 **Resizable**
 
