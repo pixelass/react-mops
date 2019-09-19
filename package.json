@@ -9,7 +9,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "lerna run dev --parallel",
-    "build": "lerna run build --stream"
+    "build": "lerna run build --stream",
+    "prerelease": "lerna run build --scope react-mops",
+    "release": "lerna publish --conventional-commits"
   },
   "workspaces": [
     "packages/*"
