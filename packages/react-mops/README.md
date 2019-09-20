@@ -64,7 +64,7 @@ Tests and documentation has not been written **yet**. Please look at the [exampl
 import {Box} from "react-mops";
 
 const wrapperStyle = {
-    position "relative"
+    position: "relative",
     height: 500,
     width: 500,
     boxShadow: "0 0 0 1px black"
