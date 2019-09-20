@@ -1,6 +1,5 @@
-> **M**odify **O**rientation **P**osition **S**ize
-
 # M.O.P.S
+**M**odify **O**rientation **P**osition **S**ize
 
 [![MIT license][license-badge]][license]
 [![Code of Conduct][coc-badge]][coc]
