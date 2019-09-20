@@ -1,6 +1,11 @@
 # M.O.P.S.
 **M**odify **O**rientation **P**osition **S**ize
 
+> German >> English: **Mops**  >> **Pug**  
+> it moves, it stretches, it rolls around  
+
+![Logo](https://dekk-app.github.io/react-mops/logo.jpg)
+
 <!-- toc -->
 
 - [Value Proposition](#value-proposition)
@@ -117,4 +122,8 @@ https://codesandbox.io/s/react-mops-4cwhx
 **Combined**
 
 ![combined](https://dekk-app.github.io/react-mops/mops_combined.gif)
+
+
+Pug icons [created by freepik - www.freepik.com](https://www.freepik.com/free-photos-vectors/design);
+
 

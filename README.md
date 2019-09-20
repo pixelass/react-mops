@@ -1,6 +1,12 @@
 # M.O.P.S
 **M**odify **O**rientation **P**osition **S**ize
 
+> German >> English: **Mops**  >> **Pug**  
+> it moves, it stretches, it rolls around  
+
+![Logo](https://dekk-app.github.io/react-mops/logo.jpg)
+
+
 [![MIT license][license-badge]][license]
 [![Code of Conduct][coc-badge]][coc]
 
@@ -26,6 +32,8 @@ yarn dev
 ## License
 
 Copyright by [Gregor Adams][pixelass]. All packages are released under the [MIT license][license].
+
+Pug icons [created by freepik - www.freepik.com](https://www.freepik.com/free-photos-vectors/design);
 
 <!-- User support -->
 
