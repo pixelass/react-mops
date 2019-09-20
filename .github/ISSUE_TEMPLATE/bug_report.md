@@ -16,7 +16,7 @@ Steps to reproduce the behavior:
 
 **Codesandbox**
 
-Here's a codesandbox that shows this issue: https://codesandbox.io/s/m1wxp21rx
+Here's a codesandbox that shows this issue: https://codesandbox.io/s/react-mops-issue-template-jodfo
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
@@ -25,7 +25,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
- - OS: [e.g. iOS]
+ - OS: [e.g. OS X]
  - Browser [e.g. chrome, safari]
  - Version [e.g. 22]
 
