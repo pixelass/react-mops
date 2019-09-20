@@ -1,5 +1,5 @@
-import {Mops} from "./types";
 import React from "react";
+import {Mops} from "./types";
 
 /**
  * @param value

@@ -1,5 +1,5 @@
+import {resizeClasses, resizeCursors, rotationClasses, rotationCursors} from "react-mops";
 import {createGlobalStyle, css} from "styled-components";
-import {rotationClasses, rotationCursors, resizeClasses, resizeCursors} from "react-mops";
 
 export const GlobalStyle = createGlobalStyle`
 	body {

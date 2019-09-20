@@ -4,8 +4,7 @@ import {Mops} from "./types";
 export const {Provider: PropProvider, Consumer: PropConsumer} = React.createContext<
 	Mops.ProviderProps
 >({
-
-	getCursorSlice: (n) => n,
+	getCursorSlice: n => n,
 	handleRotationDown: () => undefined,
 	isDraggable: false,
 	isResizable: false,
@@ -28,44 +27,45 @@ const HandleBase: React.ForwardRefExoticComponent<Mops.HandleProps> = React.forw
 			[onClick]
 		);
 		return (
-		<PropConsumer>
-			{({handleRotationDown, isResizable, isRotatable, getCursorSlice, metaKey}) => {
-				const cursorSlice = getCursorSlice(Mops.HandleVariations[variation]);
-				const rotationSlice = rotationCursors[cursorSlice];
-				const resizeSlice = resizeCursors[cursorSlice % resizeCursors.length];
-				const componentStyle: React.CSSProperties = {
-					...style,
-					cursor: metaKey
-						? isRotatable
-							? `
+			<PropConsumer>
+				{({handleRotationDown, isResizable, isRotatable, getCursorSlice, metaKey}) => {
+					const cursorSlice = getCursorSlice(Mops.HandleVariations[variation]);
+					const rotationSlice = rotationCursors[cursorSlice];
+					const resizeSlice = resizeCursors[cursorSlice % resizeCursors.length];
+					const componentStyle: React.CSSProperties = {
+						...style,
+						cursor: metaKey
+							? isRotatable
+								? `
 								-webkit-image-set(url("${rotationSlice["1x"]}") 1x,
 								url("${rotationSlice["2x"]}") 2x) 9 9, default
 							`
-							: "default"
-						: isResizable
-						? resizeSlice
-						: "default",
-					height: 20,
-					position: "absolute",
-					visibility: "visible",
-					width: 20,
-					zIndex: 2
-				};
+								: "default"
+							: isResizable
+							? resizeSlice
+							: "default",
+						height: 20,
+						position: "absolute",
+						visibility: "visible",
+						width: 20,
+						zIndex: 2
+					};
 
-				return (
-					<a
-						{...props}
-						href="#"
-						ref={ref}
-						style={componentStyle}
-						onClick={handleClick}
-						onMouseDown={metaKey ? handleRotationDown : onMouseDown}>
-						{children}
-					</a>
-				);
-			}}
-		</PropConsumer>
-	)}
+					return (
+						<a
+							{...props}
+							href="#"
+							ref={ref}
+							style={componentStyle}
+							onClick={handleClick}
+							onMouseDown={metaKey ? handleRotationDown : onMouseDown}>
+							{children}
+						</a>
+					);
+				}}
+			</PropConsumer>
+		);
+	}
 );
 
 const HandleMarker: React.FunctionComponent = ({children}) => (

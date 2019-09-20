@@ -1,7 +1,6 @@
-import {Mops} from "./types";
 import React from "react";
-import {coordinatesToDeg, withRotation} from "./utils";
-import {resizeClasses, rotationClasses} from "./cursors";
+import {Mops} from "../types";
+import {coordinatesToDeg, to360, withRotation} from "../utils";
 
 /**
  * Mousemove hook
@@ -88,75 +87,6 @@ export const useMouseMove = (
 
 	return [isDown, handleDown] as [boolean, (e: React.MouseEvent<HTMLElement>) => void];
 };
-
-export interface UseHandleProps {
-	setSize: (s: Mops.SizeModel | ((state: Mops.SizeModel) => Mops.SizeModel)) => void;
-	setInitialSize: (s: Mops.SizeModel | ((state: Mops.SizeModel) => Mops.SizeModel)) => void;
-	setPosition: (
-		p: Mops.PositionModel | ((state: Mops.PositionModel) => Mops.PositionModel)
-	) => void;
-	setInitialPosition: (
-		p: Mops.PositionModel | ((state: Mops.PositionModel) => Mops.PositionModel)
-	) => void;
-	handleSize: (
-		p: Mops.PositionModel,
-		altKey: boolean,
-		shiftKey: boolean
-	) => (s: Mops.SizeModel) => Mops.SizeModel;
-	handlePosition: (
-		p: Mops.PositionModel,
-		altKey: boolean,
-		shiftKey: boolean
-	) => (p: Mops.PositionModel) => Mops.PositionModel;
-	scale: number;
-	rotation?: Mops.RotationModel;
-	contentRef?: React.RefObject<HTMLElement>;
-}
-
-/**
- *
- * @param options
- * @param options.setSize
- * @param options.setInitialSize
- * @param options.setPosition
- * @param options.setInitialPosition
- * @param options.handleSize
- * @param options.handlePosition
- * @param options.scale
- * @param options.rotation
- * @param options.contentRef
- */
-export const useHandle = ({
-	setSize,
-	setInitialSize,
-	setPosition,
-	setInitialPosition,
-	handleSize,
-	handlePosition,
-	scale,
-	rotation,
-	contentRef
-}: UseHandleProps) => {
-	const [isDown, setDown] = useMouseMove(
-		(position: Mops.PositionModel, altKey: boolean, shiftKey: boolean) => {
-			setSize(handleSize(position, altKey, shiftKey));
-			setInitialSize(handleSize(position, altKey, shiftKey));
-			const nextPosition = handlePosition(position, altKey, shiftKey);
-			setPosition(nextPosition);
-			setInitialPosition(nextPosition);
-		},
-		(position: Mops.PositionModel, altKey: boolean, shiftKey: boolean) => {
-			setSize(handleSize(position, altKey, shiftKey));
-			const nextPosition = handlePosition(position, altKey, shiftKey);
-			setPosition(nextPosition);
-		},
-		scale,
-		contentRef,
-		rotation
-	);
-	return [isDown, setDown] as [boolean, (e: React.MouseEvent<HTMLElement>) => void];
-};
-
 /**
  *
  * @param onMouseUp
@@ -230,55 +160,56 @@ export const useMouseMoveEvent = (
 
 	return [isDown, handleDown] as [boolean, (e: React.MouseEvent<HTMLElement>) => void];
 };
-
-/**
- *
- */
-export const useMeta = () => {
-	const [metaKey, setMetaKey] = React.useState(false);
-	const handleKeyDown = React.useCallback(
-		(e: KeyboardEvent) => {
-			if (e.key === "Meta") {
-				setMetaKey(true);
+export const useHandleMouseEvent = ({additionalAngle, contentRef, initialRotation, isRotatable}) =>
+	React.useCallback(
+		(event: React.MouseEvent<HTMLElement> | MouseEvent, init?: boolean) => {
+			if (
+				!isRotatable ||
+				!contentRef ||
+				!(contentRef as React.RefObject<HTMLElement>).current
+			) {
+				return false;
 			}
+			const {clientX, clientY} = event;
+			const {left, top, width, height} = (contentRef as React.RefObject<
+				HTMLElement
+			>).current.getBoundingClientRect();
+			const pointer = {x: clientX - left, y: clientY - top};
+			const center = {x: width / 2, y: height / 2};
+			const deg = coordinatesToDeg(pointer, center);
+			const newRotationZ = to360(initialRotation.z + (deg - additionalAngle.z));
+			const newRotation = (state: Mops.RotationModel) => ({
+				x: state.x,
+				y: state.y,
+				z: init
+					? to360(initialRotation.z)
+					: event.shiftKey
+					? Math.round(newRotationZ / 15) * 15
+					: newRotationZ
+			});
+			return {
+				deg,
+				rotation: newRotation
+			};
 		},
-		[setMetaKey]
+		[contentRef, initialRotation]
 	);
-
-	const handleKeyUp = React.useCallback(
-		(e: KeyboardEvent) => {
-			if (e.key === "Meta") {
-				setMetaKey(false);
-			}
+export const useHandleMouse = ({currentRotation, currentSize, initialPosition, shouldSnap}) =>
+	React.useCallback(
+		({x, y}) => {
+			const newPosition = {
+				x: initialPosition.x + x,
+				y: initialPosition.y + y
+			};
+			return shouldSnap.reduce(
+				(model, fn) => ({
+					...(fn(
+						{position: newPosition, size: currentSize, rotation: currentRotation},
+						model
+					) as Mops.SnapHandler)
+				}),
+				newPosition
+			) as Mops.PositionModel;
 		},
-		[setMetaKey]
+		[currentSize, currentRotation, initialPosition]
 	);
-
-	const handleFocus = React.useCallback(() => {
-		setMetaKey(false);
-	}, [setMetaKey]);
-
-	React.useEffect(() => {
-		window.addEventListener("focus", handleFocus);
-		window.addEventListener("blur", handleFocus);
-		return () => {
-			window.removeEventListener("focus", handleFocus);
-			window.removeEventListener("blur", handleFocus);
-		};
-	}, [handleFocus]);
-
-	React.useEffect(() => {
-		window.addEventListener("keydown", handleKeyDown);
-		return () => {
-			window.removeEventListener("keydown", handleKeyDown);
-		};
-	}, [handleKeyDown]);
-
-	React.useEffect(() => {
-		window.addEventListener("keyup", handleKeyUp);
-		return () => {
-			window.removeEventListener("keyup", handleKeyUp);
-		};
-	}, [handleKeyUp]);
-	return metaKey;
-};

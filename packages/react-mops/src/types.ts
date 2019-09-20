@@ -1,7 +1,6 @@
 import React from "react";
 
 export namespace Mops {
-
 	/**
 	 * @typedef InitialSizeModel
 	 * @type {object}
@@ -34,7 +33,6 @@ export namespace Mops {
 		x: number;
 		y: number;
 	}
-
 
 	/**
 	 * @typedef RotationModel
@@ -83,7 +81,10 @@ export namespace Mops {
 	 * @param {BoundingBox} boundingBox
 	 *
 	 */
-	export type SnapHandler = (boundingBox: BoundingBox, model?: PositionModel) => Partial<PositionModel>;
+	export type SnapHandler = (
+		boundingBox: BoundingBox,
+		model?: PositionModel
+	) => Partial<PositionModel>;
 
 	/**
 	 * @typedef EventHandler
@@ -145,7 +146,7 @@ export namespace Mops {
 		nw,
 		n,
 		ne
-	};
+	}
 	export type HandleVariation = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
 	export interface HandleProps {
 		ref?: React.Ref<HTMLAnchorElement>;
@@ -180,8 +181,32 @@ export namespace Mops {
 		isResizable?: boolean;
 		isRotatable?: boolean;
 		isDraggable?: boolean;
-		getCursorSlice?: (n:  number) => number;
+		getCursorSlice?: (n: number) => number;
 		handleRotationDown?: (e: React.MouseEvent) => void;
 		metaKey?: boolean;
+	}
+
+	export interface UseHandleProps {
+		setSize: (s: Mops.SizeModel | ((state: Mops.SizeModel) => Mops.SizeModel)) => void;
+		setInitialSize: (s: Mops.SizeModel | ((state: Mops.SizeModel) => Mops.SizeModel)) => void;
+		setPosition: (
+			p: Mops.PositionModel | ((state: Mops.PositionModel) => Mops.PositionModel)
+		) => void;
+		setInitialPosition: (
+			p: Mops.PositionModel | ((state: Mops.PositionModel) => Mops.PositionModel)
+		) => void;
+		handleSize: (
+			p: Mops.PositionModel,
+			altKey: boolean,
+			shiftKey: boolean
+		) => (s: Mops.SizeModel) => Mops.SizeModel;
+		handlePosition: (
+			p: Mops.PositionModel,
+			altKey: boolean,
+			shiftKey: boolean
+		) => (p: Mops.PositionModel) => Mops.PositionModel;
+		scale: number;
+		rotation?: Mops.RotationModel;
+		contentRef?: React.RefObject<HTMLElement>;
 	}
 }

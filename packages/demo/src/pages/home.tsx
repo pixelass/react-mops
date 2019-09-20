@@ -1,5 +1,5 @@
-import {Box, Mops, coordinatesToDeg, resizeClasses, rotationClasses} from "react-mops";
 import React from "react";
+import {Box, coordinatesToDeg, Mops, resizeClasses, rotationClasses} from "react-mops";
 import styled, {css, ThemeProvider} from "styled-components";
 
 const theme = {};
@@ -74,12 +74,9 @@ export function Home() {
 		},
 		[setWindowPointer]
 	);
-	const removeClasses = React.useCallback(
-		(e: MouseEvent) => {
-			document.body.classList.remove(...rotationClasses, ...resizeClasses)
-		},
-		[]
-	);
+	const removeClasses = React.useCallback((e: MouseEvent) => {
+		document.body.classList.remove(...rotationClasses, ...resizeClasses);
+	}, []);
 	React.useEffect(() => {
 		window.addEventListener("mousemove", handleMouseMove);
 		return () => {
@@ -99,16 +96,21 @@ export function Home() {
 			<Examples>
 				<Wrapper>
 					<h3>Resizable</h3>
-					<p><code>Alt</code> to resize in opposite directions</p>
-					<p><code>Shift</code> to retain the aspect-ratio</p>
-					<p><code>Alt + Shift</code> to resize in opposite directions and retain the aspect-ratio</p>
+					<p>
+						<code>Alt</code> to resize in opposite directions
+					</p>
+					<p>
+						<code>Shift</code> to retain the aspect-ratio
+					</p>
+					<p>
+						<code>Alt + Shift</code> to resize in opposite directions and retain the
+						aspect-ratio
+					</p>
 					<Box
 						ref={resizableRef as React.Ref<HTMLElement>}
 						isResizable
 						onResizeEnd={() => {
-							document.body.classList.remove(
-								...resizeClasses
-							);
+							document.body.classList.remove(...resizeClasses);
 						}}
 						onResize={() => {
 							if (resizableRef && resizableRef.current) {
@@ -125,9 +127,7 @@ export function Home() {
 								const rotationStep =
 									(Math.round(deg / 45) + rotationClasses.length) %
 									rotationClasses.length;
-								document.body.classList.remove(
-									...resizeClasses,
-								);
+								document.body.classList.remove(...resizeClasses);
 								document.body.classList.add(
 									resizeClasses[rotationStep % resizeClasses.length]
 								);
@@ -146,15 +146,17 @@ export function Home() {
 				</Wrapper>
 				<Wrapper>
 					<h3>Rotatable</h3>
-					<p><code>CMD</code> to rotate</p>
-					<p><code>CMD + Shift</code> to rotate in steps</p>
+					<p>
+						<code>CMD</code> to rotate
+					</p>
+					<p>
+						<code>CMD + Shift</code> to rotate in steps
+					</p>
 					<Box
 						ref={rotatableRef as React.Ref<HTMLElement>}
 						isRotatable
 						onRotateEnd={() => {
-							document.body.classList.remove(
-								...rotationClasses
-							);
+							document.body.classList.remove(...rotationClasses);
 						}}
 						onRotate={() => {
 							if (rotatableRef && rotatableRef.current) {
@@ -171,9 +173,7 @@ export function Home() {
 								const rotationStep =
 									(Math.round(deg / 45) + rotationClasses.length) %
 									rotationClasses.length;
-								document.body.classList.remove(
-									...rotationClasses
-								);
+								document.body.classList.remove(...rotationClasses);
 								document.body.classList.add(
 									rotationClasses[rotationStep % rotationClasses.length]
 								);
@@ -194,10 +194,12 @@ export function Home() {
 					<h3>Draggable</h3>
 					<Box
 						ref={draggableRef as React.Ref<HTMLElement>}
-						shouldSnap={[
-							// toGrid({x: 25, y: 25}),
-							// toBounds({top: 0, right: 500, bottom: 500, left: 0})
-						]}
+						shouldSnap={
+							[
+								// toGrid({x: 25, y: 25}),
+								// toBounds({top: 0, right: 500, bottom: 500, left: 0})
+							]
+						}
 						isDraggable
 						position={{
 							x: 250,
@@ -212,20 +214,29 @@ export function Home() {
 				</Wrapper>
 				<Wrapper>
 					<h3>All combined</h3>
-					<p><code>CMD</code> to rotate</p>
-					<p><code>CMD + Shift</code> to rotate in steps</p>
-					<p><code>Alt</code> to resize in opposite directions</p>
-					<p><code>Shift</code> to retain the aspect-ratio</p>
-					<p><code>Alt + Shift</code> to resize in opposite directions and retain the aspect-ratio</p>
+					<p>
+						<code>CMD</code> to rotate
+					</p>
+					<p>
+						<code>CMD + Shift</code> to rotate in steps
+					</p>
+					<p>
+						<code>Alt</code> to resize in opposite directions
+					</p>
+					<p>
+						<code>Shift</code> to retain the aspect-ratio
+					</p>
+					<p>
+						<code>Alt + Shift</code> to resize in opposite directions and retain the
+						aspect-ratio
+					</p>
 					<Box
 						ref={allRef as React.Ref<HTMLElement>}
 						isRotatable
 						isResizable
 						isDraggable
 						onResizeEnd={() => {
-							document.body.classList.remove(
-								...resizeClasses
-							);
+							document.body.classList.remove(...resizeClasses);
 						}}
 						onResize={() => {
 							if (allRef && allRef.current) {
@@ -242,18 +253,14 @@ export function Home() {
 								const rotationStep =
 									(Math.round(deg / 45) + rotationClasses.length) %
 									rotationClasses.length;
-								document.body.classList.remove(
-									...resizeClasses,
-								);
+								document.body.classList.remove(...resizeClasses);
 								document.body.classList.add(
 									resizeClasses[rotationStep % resizeClasses.length]
 								);
 							}
 						}}
 						onRotateEnd={() => {
-							document.body.classList.remove(
-								...rotationClasses
-							);
+							document.body.classList.remove(...rotationClasses);
 						}}
 						onRotate={() => {
 							if (allRef && allRef.current) {
@@ -270,9 +277,7 @@ export function Home() {
 								const rotationStep =
 									(Math.round(deg / 45) + rotationClasses.length) %
 									rotationClasses.length;
-								document.body.classList.remove(
-									...rotationClasses
-								);
+								document.body.classList.remove(...rotationClasses);
 								document.body.classList.add(
 									rotationClasses[rotationStep % rotationClasses.length]
 								);

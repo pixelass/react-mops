@@ -5,5 +5,6 @@ module.exports = {
 	requirePragma: false,
 	semi: true,
 	singleQuote: false,
-	trailingComma: "none"
+	trailingComma: "none",
+	printWidth: 100
 };
