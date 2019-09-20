@@ -4,7 +4,7 @@
 > German >> English: **Mops**  >> **Pug**  
 > it moves, it stretches, it rolls around  
 
-![Logo](https://dekk-app.github.io/react-mops/logo.jpg)
+<p align="center"><img width="100%" src="https://dekk-app.github.io/react-mops/logo.jpg" alt="M.O.P.S. logo"></p>
 
 <!-- toc -->
 
