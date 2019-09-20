@@ -1,5 +1,5 @@
 import React from "react";
-import {rotationClasses, rotationCursors} from "./cursors";
+import {rotationCursors} from "./cursors";
 import {Content, Handle, Handles, PropProvider, Wrapper} from "./elements";
 import {useHandle, useMeta, useMouseMove, useMouseMoveEvent} from "./hooks";
 import {Mops} from "./types";
@@ -40,8 +40,8 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 		const [initialPosition, setInitialPosition] = React.useState<Mops.PositionModel>(position);
 		const [currentPosition, setPosition] = React.useState<Mops.PositionModel>(initialPosition);
 		const [initialRotation, setInitialRotation] = React.useState<Mops.RotationModel>(rotation);
-		const [additionalAngle, setAdditionalAngle] = React.useState<Mops.RotationModel>(rotation);
 		const [currentRotation, setRotation] = React.useState<Mops.RotationModel>(initialRotation);
+		const [additionalAngle, setAdditionalAngle] = React.useState<Mops.RotationModel>(rotation);
 		const metaKey = useMeta();
 
 		const handleDrag = React.useCallback(
@@ -135,12 +135,14 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 			({handleSize, handlePosition}) => {
 				return useHandle({
 					contentRef: contentRef as React.RefObject<HTMLElement>,
-					handlePosition: ({x, y}, altKey) => state => {
+					handlePosition: ({x, y}, altKey, shiftKey) => state => {
 						if (!isResizable) {
 							return state;
 						}
-						const positionState = handlePosition({x, y}, altKey);
-						return typeof positionState === "function" ? positionState(state) : positionState;
+						const positionState = handlePosition({x, y}, altKey, shiftKey);
+						return typeof positionState === "function"
+							? positionState(state)
+							: positionState;
 					},
 					handleSize: ({x, y}, altKey, shiftKey) => state => {
 						if (!isResizable) {
@@ -157,26 +159,54 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 					setSize
 				});
 			},
-			[setInitialPosition, setInitialSize, setPosition, setSize, currentRotation, scale, contentRef]
+			[
+				setInitialPosition,
+				setInitialSize,
+				setPosition,
+				setSize,
+				currentRotation,
+				scale,
+				contentRef
+			]
 		);
 
 		const withCornerHandle = React.useCallback(
-			({getPositionDiff, handleSize}) =>
+			({getPositionDiff, getSizeDiff}) =>
 				withHandle({
 					handlePosition: ({x, y}, altKey, shiftKey) => state => {
 						if (altKey) {
 							return state;
 						}
+						const dX = getPositionDiff(x);
 						const e = withRotation(x, 0, currentRotation.z);
-						const d = getPositionDiff({x, y}, e, altKey, shiftKey);
+						const d = withRotation(
+							0,
+							shiftKey
+								? initialSize.height -
+										withAspectRatio(initialSize.width + dX, initialSize, true)
+								: y,
+							currentRotation.z
+						);
 						return {
 							x: initialPosition.x - d.x / 2 + e.x / 2,
 							y: initialPosition.y + d.y / 2 - e.y / 2
 						};
 					},
-					handleSize
+					handleSize: ({x, y}, altKey, shiftKey) => {
+						const d = getSizeDiff({x, y});
+						return {
+							height: shiftKey
+								? withAspectRatio(
+										initialSize.width + withAlt(d.x, altKey),
+										initialSize,
+										true
+								  )
+								: initialSize.height + withAlt(d.y, altKey),
+							width: initialSize.width + withAlt(d.x, altKey)
+						};
+					}
 				}),
-			[withHandle, currentRotation, initialPosition]
+			[withHandle, currentRotation, initialPosition, initialSize]
 		);
 
 		const [isTopDown, setTopDown] = withHandle({
@@ -244,187 +274,124 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 		});
 
 		const [isTopLeftDown, setTopLeftDown] = withCornerHandle({
-			getPositionDiff: ({x, y}, e, altKey, shiftKey) =>
-				withRotation(
-					0,
-					shiftKey
-						? initialSize.height -
-								withAspectRatio(initialSize.width - x, initialSize, true)
-						: y,
-					currentRotation.z
-				),
-			handleSize: ({x, y}, altKey, shiftKey) => ({
-				height: shiftKey
-					? withAspectRatio(initialSize.width - withAlt(x, altKey), initialSize, true)
-					: initialSize.height - withAlt(y, altKey),
-				width: initialSize.width - withAlt(x, altKey)
-			})
+			getPositionDiff: x => -x,
+			getSizeDiff: ({x, y}) => ({x: -x, y: -y})
 		});
 
 		const [isTopRightDown, setTopRightDown] = withCornerHandle({
-			getPositionDiff: ({x, y}, altKey, shiftKey) =>
-				withRotation(
-					0,
-					shiftKey
-						? initialSize.height -
-								withAspectRatio(initialSize.width + x, initialSize, true)
-						: y,
-					currentRotation.z
-				),
-			handleSize: ({x, y}, altKey, shiftKey) => ({
-				height: shiftKey
-					? withAspectRatio(initialSize.width + withAlt(x, altKey), initialSize, true)
-					: initialSize.height - withAlt(y, altKey),
-				width: initialSize.width + withAlt(x, altKey)
-			})
+			getPositionDiff: x => x,
+			getSizeDiff: ({x, y}) => ({x, y: -y})
 		});
 
 		const [isBottomLeftDown, setBottomLeftDown] = withCornerHandle({
-			getPositionDiff: ({x, y}, altKey, shiftKey) =>
-				withRotation(
-					0,
-					shiftKey
-						? initialSize.height -
-								withAspectRatio(initialSize.width + x, initialSize, true)
-						: y,
-					currentRotation.z
-				),
-			handleSize: ({x, y}, altKey, shiftKey) => ({
-				height: shiftKey
-					? withAspectRatio(initialSize.width - withAlt(x, altKey), initialSize, true)
-					: initialSize.height + withAlt(y, altKey),
-				width: initialSize.width - withAlt(x, altKey)
-			})
+			getPositionDiff: x => x,
+			getSizeDiff: ({x, y}) => ({x: -x, y})
 		});
 
 		const [isBottomRightDown, setBottomRightDown] = withCornerHandle({
-			getPositionDiff: ({x, y}, altKey, shiftKey) =>
-				withRotation(
-					0,
-					shiftKey
-						? initialSize.height -
-								withAspectRatio(initialSize.width - x, initialSize, true)
-						: y,
-					currentRotation.z
-				),
-			handleSize: ({x, y}, altKey, shiftKey) => ({
-				height: shiftKey
-					? withAspectRatio(initialSize.width + withAlt(x, altKey), initialSize, true)
-					: initialSize.height + withAlt(y, altKey),
-				width: initialSize.width + withAlt(x, altKey)
-			})
+			getPositionDiff: x => -x,
+			getSizeDiff: ({x, y}) => ({x, y})
 		});
-		const [isDown, setDown] = useMouseMove(
+
+		const handleMouse = React.useCallback(
 			({x, y}) => {
 				const newPosition = {
 					x: initialPosition.x + x,
 					y: initialPosition.y + y
 				};
-				const withSnapLogic = shouldSnap.reduce(
+				return shouldSnap.reduce(
 					(model, fn) => ({
-						...fn(
+						...(fn(
 							{position: newPosition, size: currentSize, rotation: currentRotation},
 							model
-						)
+						) as Mops.SnapHandler)
 					}),
 					newPosition
 				) as Mops.PositionModel;
+			},
+			[currentSize, currentRotation, initialPosition]
+		);
+
+		const [isDown, setDown] = useMouseMove(
+			p => {
+				const withSnapLogic = handleMouse(p);
 				setPosition(withSnapLogic);
 				setInitialPosition(withSnapLogic);
 			},
-			({x, y}) => {
-				const newPosition = {
-					x: initialPosition.x + x,
-					y: initialPosition.y + y
-				};
-				const withSnapLogic = shouldSnap.reduce(
-					(model, fn) => ({
-						...fn(
-							{position: newPosition, size: currentSize, rotation: currentRotation},
-							model
-						)
-					}),
-					newPosition
-				) as Mops.PositionModel;
+			p => {
+				const withSnapLogic = handleMouse(p);
 				setPosition(withSnapLogic);
 			},
-			scale as number
+			scale
 		);
+
+		const handleMouseEvent = React.useCallback(
+			(event: React.MouseEvent<HTMLElement> | MouseEvent, init?: boolean) => {
+				if (
+					!isRotatable ||
+					!contentRef ||
+					!(contentRef as React.RefObject<HTMLElement>).current
+				) {
+					return false;
+				}
+				const {clientX, clientY} = event;
+				const {left, top, width, height} = (contentRef as React.RefObject<
+					HTMLElement
+				>).current.getBoundingClientRect();
+				const pointer = {x: clientX - left, y: clientY - top};
+				const center = {x: width / 2, y: height / 2};
+				const deg = coordinatesToDeg(pointer, center);
+				const newRotationZ = to360(initialRotation.z + (deg - additionalAngle.z));
+				const newRotation = (state: Mops.RotationModel) => ({
+					x: state.x,
+					y: state.y,
+					z: init
+						? to360(initialRotation.z)
+						: event.shiftKey
+						? Math.round(newRotationZ / 15) * 15
+						: newRotationZ
+				});
+				return {
+					deg,
+					rotation: newRotation
+				};
+			},
+			[contentRef, initialRotation]
+		);
+
 		const [isRotationDown, handleRotationDown] = useMouseMoveEvent(
 			(event: MouseEvent) => {
-				if (!isRotatable) {
-					return;
-				}
-				if (contentRef && (contentRef as React.RefObject<HTMLElement>).current) {
-					const {left, top, width, height} = (contentRef as React.RefObject<
-						HTMLElement
-					>).current.getBoundingClientRect();
-					const pointer = {x: event.clientX - left, y: event.clientY - top};
-					const center = {x: width / 2, y: height / 2};
-					const deg = coordinatesToDeg(pointer, center);
-					const newRotationZ = to360(initialRotation.z + (deg - additionalAngle.z));
-					const newRotation = state => ({
-						x: state.x,
-						y: state.y,
-						z: event.shiftKey ? Math.round(newRotationZ / 15) * 15 : newRotationZ
-					});
-					setRotation(newRotation);
-					setInitialRotation(newRotation);
+				const d = handleMouseEvent(event);
+				if (d) {
+					setRotation(d.rotation);
+					setInitialRotation(d.rotation);
 				}
 			},
 			(event: MouseEvent) => {
-				if (!isRotatable) {
-					return;
-				}
-				if (contentRef && (contentRef as React.RefObject<HTMLElement>).current) {
-					const {clientX, clientY} = event;
-					const {left, top, width, height} = (contentRef as React.RefObject<
-						HTMLElement
-					>).current.getBoundingClientRect();
-					const pointer = {x: clientX - left, y: clientY - top};
-					const center = {x: width / 2, y: height / 2};
-					const deg = coordinatesToDeg(pointer, center);
-					const newRotationZ = to360(initialRotation.z + (deg - additionalAngle.z));
-					const newRotation = (state: Mops.RotationModel) => ({
-						x: state.x,
-						y: state.y,
-						z: event.shiftKey ? Math.round(newRotationZ / 15) * 15 : newRotationZ
-					});
-					setRotation(newRotation);
+				const d = handleMouseEvent(event);
+				if (d) {
+					setRotation(d.rotation);
 				}
 			},
 			(event: React.MouseEvent<HTMLElement>) => {
-				if (!isRotatable) {
-					return;
-				}
-				if (contentRef && (contentRef as React.RefObject<HTMLElement>).current) {
-					const {clientX, clientY} = event;
-					const {left, top, width, height} = (contentRef as React.RefObject<
-						HTMLElement
-					>).current.getBoundingClientRect();
-					const pointer = {x: clientX - left, y: clientY - top};
-					const center = {x: width / 2, y: height / 2};
-					const deg = coordinatesToDeg(pointer, center);
-					const newRotation = (state: Mops.RotationModel) => ({
-						x: state.x,
-						y: state.y,
-						z: to360(initialRotation.z)
-					});
-					setRotation(newRotation);
-					setInitialRotation(newRotation);
-					setAdditionalAngle({x: 0, y: 0, z: deg});
+				const d = handleMouseEvent(event, true);
+				if (d) {
+					setRotation(d.rotation);
+					setInitialRotation(d.rotation);
+					setAdditionalAngle({x: 0, y: 0, z: d.deg});
 				}
 			}
 		);
 		React.useEffect(() => {
-			if (contentRef && (contentRef as React.RefObject<HTMLElement>).current) {
+			if (contentRef && contentRef.current) {
+				const {clientHeight: height, clientWidth: width} = contentRef.current;
 				setSize({
-					height: (contentRef as React.RefObject<HTMLElement>).current.clientHeight,
-					width: (contentRef as React.RefObject<HTMLElement>).current.clientWidth
+					height,
+					width
 				});
 				setInitialSize({
-					height: (contentRef as React.RefObject<HTMLElement>).current.clientHeight,
-					width: (contentRef as React.RefObject<HTMLElement>).current.clientWidth
+					height,
+					width
 				});
 			}
 		}, [setSize, setInitialSize]);
@@ -502,11 +469,7 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 
 		const getCursorSlice = React.useCallback(
 			n => {
-				return (
-					(Math.round(to360(currentRotation.z) / 45) +
-						n) %
-					rotationCursors.length
-				);
+				return (Math.round(to360(currentRotation.z) / 45) + n) % rotationCursors.length;
 			},
 			[currentRotation]
 		);
