@@ -1,25 +1,18 @@
 import React from "react";
+import {rotationClasses, rotationCursors} from "./cursors";
+import {Content, Handle, Handles, PropProvider, Wrapper} from "./elements";
+import {useHandle, useMeta, useMouseMove, useMouseMoveEvent} from "./hooks";
 import {Mops} from "./types";
 import {coordinatesToDeg, to360, withAlt, withAspectRatio, withRotation} from "./utils";
-import {rotationClasses, rotationCursors} from "./cursors";
-import {useHandle, useMeta, useMouseMove, useMouseMoveEvent} from "./hooks";
-import {
-	Content,
-	HandleBottom,
-	HandleBottomLeft,
-	HandleBottomRight,
-	HandleLeft,
-	HandleRight,
-	Handles,
-	HandleTop,
-	HandleTopLeft,
-	HandleTopRight,
-	Wrapper
-} from "./elements";
 
 export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forwardRef(
 	(
 		{
+			as,
+			children,
+			isResizable,
+			isRotatable,
+			isDraggable,
 			onDrag,
 			onDragStart,
 			onDragEnd,
@@ -29,6 +22,11 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 			onRotate,
 			onRotateStart,
 			onRotateEnd,
+			position,
+			rotation,
+			scale,
+			shouldSnap,
+			size,
 			...props
 		},
 		ref
@@ -36,377 +34,285 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 		const contentRef = React.useRef<HTMLDivElement>();
 		const [loaded, setLoaded] = React.useState(false);
 		const [initialSize, setInitialSize] = React.useState<Mops.SizeModel>(
-			props.size as Mops.SizeModel
+			size as Mops.SizeModel
 		);
 		const [currentSize, setSize] = React.useState<Mops.SizeModel>(initialSize);
-		const [initialPosition, setInitialPosition] = React.useState<Mops.PositionModel>(
-			props.position
-		);
+		const [initialPosition, setInitialPosition] = React.useState<Mops.PositionModel>(position);
 		const [currentPosition, setPosition] = React.useState<Mops.PositionModel>(initialPosition);
-		const [initialRotation, setInitialRotation] = React.useState<Mops.RotationModel>(
-			props.rotation
-		);
-		const [additionalAngle, setAdditionalAngle] = React.useState<Mops.RotationModel>(
-			props.rotation
-		);
+		const [initialRotation, setInitialRotation] = React.useState<Mops.RotationModel>(rotation);
+		const [additionalAngle, setAdditionalAngle] = React.useState<Mops.RotationModel>(rotation);
 		const [currentRotation, setRotation] = React.useState<Mops.RotationModel>(initialRotation);
 		const metaKey = useMeta();
 
-		const handleDrag = React.useCallback(() => {
-			onDrag &&
-				onDrag({position: currentPosition, rotation: currentRotation, size: currentSize});
-		}, [onDrag, currentSize, currentPosition, currentRotation]);
-		const handleDragStart = React.useCallback(() => {
-			onDragStart &&
+		const handleDrag = React.useCallback(
+			() =>
+				onDrag &&
+				onDrag({position: currentPosition, rotation: currentRotation, size: currentSize}),
+			[onDrag, currentSize, currentPosition, currentRotation]
+		);
+
+		const handleDragStart = React.useCallback(
+			() =>
+				onDragStart &&
 				onDragStart({
 					position: currentPosition,
 					rotation: currentRotation,
 					size: currentSize
-				});
-		}, [onDragStart, currentSize, currentPosition, currentRotation]);
-		const handleDragEnd = React.useCallback(() => {
-			onDragEnd &&
+				}),
+			[onDragStart, currentSize, currentPosition, currentRotation]
+		);
+
+		const handleDragEnd = React.useCallback(
+			() =>
+				onDragEnd &&
 				onDragEnd({
 					position: currentPosition,
 					rotation: currentRotation,
 					size: currentSize
-				});
-		}, [onDragEnd, currentSize, currentPosition, currentRotation]);
+				}),
+			[onDragEnd, currentSize, currentPosition, currentRotation]
+		);
 
-		const handleResize = React.useCallback(() => {
-			onResize &&
-				onResize({position: currentPosition, rotation: currentRotation, size: currentSize});
-		}, [onResize, currentSize, currentPosition, currentRotation]);
-		const handleResizeStart = React.useCallback(() => {
-			onResizeStart &&
+		const handleResize = React.useCallback(
+			() =>
+				onResize &&
+				onResize({position: currentPosition, rotation: currentRotation, size: currentSize}),
+			[onResize, currentSize, currentPosition, currentRotation]
+		);
+
+		const handleResizeStart = React.useCallback(
+			() =>
+				onResizeStart &&
 				onResizeStart({
 					position: currentPosition,
 					rotation: currentRotation,
 					size: currentSize
-				});
-		}, [onResizeStart, currentSize, currentPosition, currentRotation]);
-		const handleResizeEnd = React.useCallback(() => {
-			onResizeEnd &&
+				}),
+			[onResizeStart, currentSize, currentPosition, currentRotation]
+		);
+
+		const handleResizeEnd = React.useCallback(
+			() =>
+				onResizeEnd &&
 				onResizeEnd({
 					position: currentPosition,
 					rotation: currentRotation,
 					size: currentSize
-				});
-		}, [onResizeEnd, currentSize, currentPosition, currentRotation]);
+				}),
+			[onResizeEnd, currentSize, currentPosition, currentRotation]
+		);
 
-		const handleRotate = React.useCallback(() => {
-			onRotate &&
-				onRotate({position: currentPosition, rotation: currentRotation, size: currentSize});
-		}, [onRotate, currentSize, currentPosition, currentRotation]);
-		const handleRotateStart = React.useCallback(() => {
-			onRotateStart &&
+		const handleRotate = React.useCallback(
+			() =>
+				onRotate &&
+				onRotate({position: currentPosition, rotation: currentRotation, size: currentSize}),
+			[onRotate, currentSize, currentPosition, currentRotation]
+		);
+
+		const handleRotateStart = React.useCallback(
+			() =>
+				onRotateStart &&
 				onRotateStart({
 					position: currentPosition,
 					rotation: currentRotation,
 					size: currentSize
-				});
-		}, [onRotateStart, currentSize, currentPosition, currentRotation]);
-		const handleRotateEnd = React.useCallback(() => {
-			onRotateEnd &&
+				}),
+			[onRotateStart, currentSize, currentPosition, currentRotation]
+		);
+
+		const handleRotateEnd = React.useCallback(
+			() =>
+				onRotateEnd &&
 				onRotateEnd({
 					position: currentPosition,
 					rotation: currentRotation,
 					size: currentSize
+				}),
+			[onRotateEnd, currentSize, currentPosition, currentRotation]
+		);
+
+		const withHandle = React.useCallback(
+			({handleSize, handlePosition}) => {
+				return useHandle({
+					contentRef: contentRef as React.RefObject<HTMLElement>,
+					handlePosition: ({x, y}, altKey) => state => {
+						if (!isResizable) {
+							return state;
+						}
+						const positionState = handlePosition({x, y}, altKey);
+						return typeof positionState === "function" ? positionState(state) : positionState;
+					},
+					handleSize: ({x, y}, altKey, shiftKey) => state => {
+						if (!isResizable) {
+							return state;
+						}
+						const sizeState = handleSize({x, y}, altKey, shiftKey);
+						return typeof sizeState === "function" ? sizeState(state) : sizeState;
+					},
+					rotation: currentRotation,
+					scale,
+					setInitialPosition,
+					setInitialSize,
+					setPosition,
+					setSize
 				});
-		}, [onRotateEnd, currentSize, currentPosition, currentRotation]);
+			},
+			[setInitialPosition, setInitialSize, setPosition, setSize, currentRotation, scale, contentRef]
+		);
 
-		const [isTopDown, setTopDown] = useHandle({
-			setSize,
-			setInitialSize,
-			setPosition,
-			setInitialPosition,
-			scale: props.scale as number,
-			rotation: currentRotation,
-			contentRef: contentRef as React.RefObject<HTMLElement>,
-			handleSize: ({x, y}, altKey, shiftKey) => state =>
-				!props.isResizable
-					? state
-					: {
-							height: initialSize.height - withAlt(y, altKey),
-							width: shiftKey
-								? withAspectRatio(
-										initialSize.height - withAlt(y, altKey),
-										initialSize
-								  )
-								: state.width
-					  },
-			handlePosition: ({x, y}, altKey) => state => {
-				if (!props.isResizable) {
-					return state;
-				}
+		const withCornerHandle = React.useCallback(
+			({getPositionDiff, handleSize}) =>
+				withHandle({
+					handlePosition: ({x, y}, altKey, shiftKey) => state => {
+						if (altKey) {
+							return state;
+						}
+						const e = withRotation(x, 0, currentRotation.z);
+						const d = getPositionDiff({x, y}, e, altKey, shiftKey);
+						return {
+							x: initialPosition.x - d.x / 2 + e.x / 2,
+							y: initialPosition.y + d.y / 2 - e.y / 2
+						};
+					},
+					handleSize
+				}),
+			[withHandle, currentRotation, initialPosition]
+		);
+
+		const [isTopDown, setTopDown] = withHandle({
+			handlePosition: ({x, y}, altKey) => {
 				const d = withRotation(0, y, currentRotation.z);
 				return {
 					x: initialPosition.x - (altKey ? 0 : d.x / 2),
 					y: initialPosition.y + (altKey ? 0 : d.y / 2)
 				};
-			}
+			},
+			handleSize: ({x, y}, altKey, shiftKey) => state => ({
+				height: initialSize.height - withAlt(y, altKey),
+				width: shiftKey
+					? withAspectRatio(initialSize.height - withAlt(y, altKey), initialSize)
+					: state.width
+			})
 		});
 
-		const [isRightDown, setRightDown] = useHandle({
-			setSize,
-			setInitialSize,
-			setPosition,
-			setInitialPosition,
-			scale: props.scale as number,
-			rotation: currentRotation,
-			contentRef: contentRef as React.RefObject<HTMLElement>,
-			handleSize: ({x, y}, altKey, shiftKey) => state =>
-				!props.isResizable
-					? state
-					: {
-							width: initialSize.width + withAlt(x, altKey),
-							height: shiftKey
-								? withAspectRatio(
-										initialSize.width + withAlt(x, altKey),
-										initialSize,
-										true
-								  )
-								: state.height
-					  },
-			handlePosition: ({x, y}, altKey) => state => {
-				if (!props.isResizable) {
-					return state;
-				}
+		const [isRightDown, setRightDown] = withHandle({
+			handlePosition: ({x, y}, altKey) => {
 				const d = withRotation(x, 0, currentRotation.z);
 				return {
 					x: initialPosition.x + (altKey ? 0 : d.x / 2),
 					y: initialPosition.y - (altKey ? 0 : d.y / 2)
 				};
-			}
+			},
+			handleSize: ({x, y}, altKey, shiftKey) => state => ({
+				height: shiftKey
+					? withAspectRatio(initialSize.width + withAlt(x, altKey), initialSize, true)
+					: state.height,
+				width: initialSize.width + withAlt(x, altKey)
+			})
 		});
 
-		const [isBottomDown, setBottomDown] = useHandle({
-			setSize,
-			setInitialSize,
-			setPosition,
-			setInitialPosition,
-			scale: props.scale as number,
-			rotation: currentRotation,
-			contentRef: contentRef as React.RefObject<HTMLElement>,
-			handleSize: ({x, y}, altKey, shiftKey) => state =>
-				!props.isResizable
-					? state
-					: {
-							height: initialSize.height + withAlt(y, altKey),
-							width: shiftKey
-								? withAspectRatio(
-										initialSize.height + withAlt(y, altKey),
-										initialSize
-								  )
-								: state.width
-					  },
-			handlePosition: ({x, y}, altKey) => state => {
-				if (!props.isResizable) {
-					return state;
-				}
+		const [isBottomDown, setBottomDown] = withHandle({
+			handlePosition: ({x, y}, altKey) => {
 				const d = withRotation(0, y, currentRotation.z);
 				return {
 					x: initialPosition.x - (altKey ? 0 : d.x / 2),
 					y: initialPosition.y + (altKey ? 0 : d.y / 2)
 				};
-			}
+			},
+			handleSize: ({x, y}, altKey, shiftKey) => state => ({
+				height: initialSize.height + withAlt(y, altKey),
+				width: shiftKey
+					? withAspectRatio(initialSize.height + withAlt(y, altKey), initialSize)
+					: state.width
+			})
 		});
 
-		const [isLeftDown, setLeftDown] = useHandle({
-			setSize,
-			setInitialSize,
-			setPosition,
-			setInitialPosition,
-			scale: props.scale as number,
-			rotation: currentRotation,
-			contentRef: contentRef as React.RefObject<HTMLElement>,
-			handleSize: ({x, y}, altKey, shiftKey) => state =>
-				!props.isResizable
-					? state
-					: {
-							width: initialSize.width - withAlt(x, altKey),
-							height: shiftKey
-								? withAspectRatio(
-										initialSize.width - withAlt(x, altKey),
-										initialSize,
-										true
-								  )
-								: state.height
-					  },
-			handlePosition: ({x, y}, altKey) => state => {
-				if (!props.isResizable) {
-					return state;
-				}
+		const [isLeftDown, setLeftDown] = withHandle({
+			handlePosition: ({x, y}, altKey) => {
 				const d = withRotation(x, 0, currentRotation.z);
 				return {
 					x: initialPosition.x + (altKey ? 0 : d.x / 2),
 					y: initialPosition.y - (altKey ? 0 : d.y / 2)
 				};
-			}
+			},
+			handleSize: ({x, y}, altKey, shiftKey) => state => ({
+				height: shiftKey
+					? withAspectRatio(initialSize.width - withAlt(x, altKey), initialSize, true)
+					: state.height,
+				width: initialSize.width - withAlt(x, altKey)
+			})
 		});
 
-		const [isTopLeftDown, setTopLeftDown] = useHandle({
-			setSize,
-			setInitialSize,
-			setPosition,
-			setInitialPosition,
-			scale: props.scale as number,
-			rotation: currentRotation,
-			contentRef: contentRef as React.RefObject<HTMLElement>,
-			handleSize: ({x, y}, altKey, shiftKey) => state =>
-				!props.isResizable
-					? state
-					: {
-							width: initialSize.width - withAlt(x, altKey),
-							height: shiftKey
-								? withAspectRatio(
-										initialSize.width - withAlt(x, altKey),
-										initialSize,
-										true
-								  )
-								: initialSize.height - withAlt(y, altKey)
-					  },
-			handlePosition: ({x, y}, altKey, shiftKey) => state => {
-				if (altKey || !props.isResizable) {
-					return state;
-				}
-				const d = withRotation(
+		const [isTopLeftDown, setTopLeftDown] = withCornerHandle({
+			getPositionDiff: ({x, y}, e, altKey, shiftKey) =>
+				withRotation(
 					0,
 					shiftKey
 						? initialSize.height -
 								withAspectRatio(initialSize.width - x, initialSize, true)
 						: y,
 					currentRotation.z
-				);
-				const e = withRotation(x, 0, currentRotation.z);
-				return {
-					x: initialPosition.x - d.x / 2 + e.x / 2,
-					y: initialPosition.y + d.y / 2 - e.y / 2
-				};
-			}
+				),
+			handleSize: ({x, y}, altKey, shiftKey) => ({
+				height: shiftKey
+					? withAspectRatio(initialSize.width - withAlt(x, altKey), initialSize, true)
+					: initialSize.height - withAlt(y, altKey),
+				width: initialSize.width - withAlt(x, altKey)
+			})
 		});
 
-		const [isTopRightDown, setTopRightDown] = useHandle({
-			setSize,
-			setInitialSize,
-			setPosition,
-			setInitialPosition,
-			scale: props.scale as number,
-			rotation: currentRotation,
-			contentRef: contentRef as React.RefObject<HTMLElement>,
-			handleSize: ({x, y}, altKey, shiftKey) => state =>
-				!props.isResizable
-					? state
-					: {
-							width: initialSize.width + withAlt(x, altKey),
-							height: shiftKey
-								? withAspectRatio(
-										initialSize.width + withAlt(x, altKey),
-										initialSize,
-										true
-								  )
-								: initialSize.height - withAlt(y, altKey)
-					  },
-			handlePosition: ({x, y}, altKey, shiftKey) => state => {
-				if (altKey || !props.isResizable) {
-					return state;
-				}
-				const d = withRotation(
+		const [isTopRightDown, setTopRightDown] = withCornerHandle({
+			getPositionDiff: ({x, y}, altKey, shiftKey) =>
+				withRotation(
 					0,
 					shiftKey
 						? initialSize.height -
 								withAspectRatio(initialSize.width + x, initialSize, true)
 						: y,
 					currentRotation.z
-				);
-				const e = withRotation(x, 0, currentRotation.z);
-				return {
-					x: initialPosition.x - d.x / 2 + e.x / 2,
-					y: initialPosition.y + d.y / 2 - e.y / 2
-				};
-			}
+				),
+			handleSize: ({x, y}, altKey, shiftKey) => ({
+				height: shiftKey
+					? withAspectRatio(initialSize.width + withAlt(x, altKey), initialSize, true)
+					: initialSize.height - withAlt(y, altKey),
+				width: initialSize.width + withAlt(x, altKey)
+			})
 		});
 
-		const [isBottomLeftDown, setBottomLeftDown] = useHandle({
-			setSize,
-			setInitialSize,
-			setPosition,
-			setInitialPosition,
-			scale: props.scale as number,
-			rotation: currentRotation,
-			contentRef: contentRef as React.RefObject<HTMLElement>,
-			handleSize: ({x, y}, altKey, shiftKey) => state =>
-				!props.isResizable
-					? state
-					: {
-							width: initialSize.width - withAlt(x, altKey),
-							height: shiftKey
-								? withAspectRatio(
-										initialSize.width - withAlt(x, altKey),
-										initialSize,
-										true
-								  )
-								: initialSize.height + withAlt(y, altKey)
-					  },
-			handlePosition: ({x, y}, altKey, shiftKey) => state => {
-				if (altKey || !props.isResizable) {
-					return state;
-				}
-				const d = withRotation(
+		const [isBottomLeftDown, setBottomLeftDown] = withCornerHandle({
+			getPositionDiff: ({x, y}, altKey, shiftKey) =>
+				withRotation(
 					0,
 					shiftKey
 						? initialSize.height -
 								withAspectRatio(initialSize.width + x, initialSize, true)
 						: y,
 					currentRotation.z
-				);
-				const e = withRotation(x, 0, currentRotation.z);
-				return {
-					x: initialPosition.x - d.x / 2 + e.x / 2,
-					y: initialPosition.y + d.y / 2 - e.y / 2
-				};
-			}
+				),
+			handleSize: ({x, y}, altKey, shiftKey) => ({
+				height: shiftKey
+					? withAspectRatio(initialSize.width - withAlt(x, altKey), initialSize, true)
+					: initialSize.height + withAlt(y, altKey),
+				width: initialSize.width - withAlt(x, altKey)
+			})
 		});
 
-		const [isBottomRightDown, setBottomRightDown] = useHandle({
-			setSize,
-			setInitialSize,
-			setPosition,
-			setInitialPosition,
-			scale: props.scale as number,
-			rotation: currentRotation,
-			contentRef: contentRef as React.RefObject<HTMLElement>,
-			handleSize: ({x, y}, altKey, shiftKey) => state =>
-				!props.isResizable
-					? state
-					: {
-							width: initialSize.width + withAlt(x, altKey),
-							height: shiftKey
-								? withAspectRatio(
-										initialSize.width + withAlt(x, altKey),
-										initialSize,
-										true
-								  )
-								: initialSize.height + withAlt(y, altKey)
-					  },
-			handlePosition: ({x, y}, altKey, shiftKey) => state => {
-				if (altKey || !props.isResizable) {
-					return state;
-				}
-				const d = withRotation(
+		const [isBottomRightDown, setBottomRightDown] = withCornerHandle({
+			getPositionDiff: ({x, y}, altKey, shiftKey) =>
+				withRotation(
 					0,
 					shiftKey
 						? initialSize.height -
 								withAspectRatio(initialSize.width - x, initialSize, true)
 						: y,
 					currentRotation.z
-				);
-				const e = withRotation(x, 0, currentRotation.z);
-				return {
-					x: initialPosition.x - d.x / 2 + e.x / 2,
-					y: initialPosition.y + d.y / 2 - e.y / 2
-				};
-			}
+				),
+			handleSize: ({x, y}, altKey, shiftKey) => ({
+				height: shiftKey
+					? withAspectRatio(initialSize.width + withAlt(x, altKey), initialSize, true)
+					: initialSize.height + withAlt(y, altKey),
+				width: initialSize.width + withAlt(x, altKey)
+			})
 		});
 		const [isDown, setDown] = useMouseMove(
 			({x, y}) => {
@@ -414,7 +320,7 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 					x: initialPosition.x + x,
 					y: initialPosition.y + y
 				};
-				const withSnapLogic = props.shouldSnap.reduce(
+				const withSnapLogic = shouldSnap.reduce(
 					(model, fn) => ({
 						...fn(
 							{position: newPosition, size: currentSize, rotation: currentRotation},
@@ -431,7 +337,7 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 					x: initialPosition.x + x,
 					y: initialPosition.y + y
 				};
-				const withSnapLogic = props.shouldSnap.reduce(
+				const withSnapLogic = shouldSnap.reduce(
 					(model, fn) => ({
 						...fn(
 							{position: newPosition, size: currentSize, rotation: currentRotation},
@@ -442,11 +348,11 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 				) as Mops.PositionModel;
 				setPosition(withSnapLogic);
 			},
-			props.scale as number
+			scale as number
 		);
 		const [isRotationDown, handleRotationDown] = useMouseMoveEvent(
 			(event: MouseEvent) => {
-				if (!props.isRotatable) {
+				if (!isRotatable) {
 					return;
 				}
 				if (contentRef && (contentRef as React.RefObject<HTMLElement>).current) {
@@ -467,7 +373,7 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 				}
 			},
 			(event: MouseEvent) => {
-				if (!props.isRotatable) {
+				if (!isRotatable) {
 					return;
 				}
 				if (contentRef && (contentRef as React.RefObject<HTMLElement>).current) {
@@ -488,7 +394,7 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 				}
 			},
 			(event: React.MouseEvent<HTMLElement>) => {
-				if (!props.isRotatable) {
+				if (!isRotatable) {
 					return;
 				}
 				if (contentRef && (contentRef as React.RefObject<HTMLElement>).current) {
@@ -594,115 +500,98 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 			setLoaded(true);
 		}, [setLoaded]);
 
-		const handleMouseDown = React.useCallback(
-			e => {
-				handleRotationDown(e);
+		const getCursorSlice = React.useCallback(
+			n => {
+				return (
+					(Math.round(to360(currentRotation.z) / 45) +
+						n) %
+					rotationCursors.length
+				);
 			},
-			[handleRotationDown]
+			[currentRotation]
 		);
 
-		const getCursorSlice = React.useCallback(n => {
-			return (Math.round(to360(currentRotation.z) / 45) + n) % rotationCursors.length;
-		}, []);
+		const style = React.useMemo(
+			() => ({
+				...currentSize,
+				transform: `
+				translate3d(${currentPosition.x}px, ${currentPosition.y}px, 0)
+				translate3d(-50%, -50%, 0) rotate3d(0, 0, 1, ${currentRotation.z}deg)
+			`
+			}),
+			[currentPosition, currentRotation, currentSize]
+		);
 
-		const style = {
-			...currentSize,
-			transform: `translate3d(${currentPosition.x}px, ${currentPosition.y}px, 0) translate3d(-50%, -50%, 0) rotate3d(0, 0, 1, ${currentRotation.z}deg)`
-		};
+		const handles: Mops.HandleProps[] = React.useMemo(
+			() => [
+				{
+					onMouseDown: setTopDown,
+					variation: "n"
+				},
+				{
+					onMouseDown: setRightDown,
+					variation: "e"
+				},
+				{
+					onMouseDown: setBottomDown,
+					variation: "s"
+				},
+				{
+					onMouseDown: setLeftDown,
+					variation: "w"
+				},
+				{
+					onMouseDown: setTopRightDown,
+					variation: "ne"
+				},
+				{
+					onMouseDown: setBottomRightDown,
+					variation: "se"
+				},
+				{
+					onMouseDown: setBottomLeftDown,
+					variation: "sw"
+				},
+				{
+					onMouseDown: setTopLeftDown,
+					variation: "nw"
+				}
+			],
+			[
+				setBottomRightDown,
+				setTopLeftDown,
+				setBottomLeftDown,
+				setTopRightDown,
+				setLeftDown,
+				setBottomDown,
+				setRightDown,
+				setTopDown
+			]
+		);
+
 		return (
-			<Wrapper
-				ref={ref as React.Ref<HTMLDivElement>}
-				as={props.as}
-				style={style}
-				isDown={isDown}>
+			<Wrapper ref={ref as React.Ref<HTMLElement>} as={as} style={style} isDown={isDown}>
 				<Content
 					ref={contentRef as React.Ref<HTMLDivElement>}
-					onMouseDown={!metaKey && props.isDraggable ? setDown : undefined}>
-					{props.children}
+					onMouseDown={!metaKey && isDraggable ? setDown : undefined}>
+					{children}
 				</Content>
-				{(props.isResizable || props.isRotatable) && (
-					<Handles>
-						<HandleTop
-							onMouseDown={metaKey ? handleMouseDown : setTopDown}
-							isRotatable={props.isRotatable}
-							isResizable={props.isResizable}
-							metaKey={metaKey}
-							cursorSlice={getCursorSlice(
-								(Math.round(currentRotation.z / 45) + rotationClasses.length + 6) %
-									rotationClasses.length
-							)}
-						/>
-						<HandleRight
-							onMouseDown={metaKey ? handleMouseDown : setRightDown}
-							isRotatable={props.isRotatable}
-							isResizable={props.isResizable}
-							metaKey={metaKey}
-							cursorSlice={getCursorSlice(
-								(Math.round(currentRotation.z / 45) + rotationClasses.length) %
-									rotationClasses.length
-							)}
-						/>
-						<HandleBottom
-							onMouseDown={metaKey ? handleMouseDown : setBottomDown}
-							isRotatable={props.isRotatable}
-							isResizable={props.isResizable}
-							metaKey={metaKey}
-							cursorSlice={getCursorSlice(
-								(Math.round(currentRotation.z / 45) + rotationClasses.length + 2) %
-									rotationClasses.length
-							)}
-						/>
-						<HandleLeft
-							onMouseDown={metaKey ? handleMouseDown : setLeftDown}
-							isRotatable={props.isRotatable}
-							isResizable={props.isResizable}
-							metaKey={metaKey}
-							cursorSlice={getCursorSlice(
-								(Math.round(currentRotation.z / 45) + rotationClasses.length + 4) %
-									rotationClasses.length
-							)}
-						/>
-						<HandleTopRight
-							onMouseDown={metaKey ? handleMouseDown : setTopRightDown}
-							isRotatable={props.isRotatable}
-							isResizable={props.isResizable}
-							metaKey={metaKey}
-							cursorSlice={getCursorSlice(
-								(Math.round(currentRotation.z / 45) + rotationClasses.length + 7) %
-									rotationClasses.length
-							)}
-						/>
-						<HandleBottomRight
-							onMouseDown={metaKey ? handleMouseDown : setBottomRightDown}
-							isRotatable={props.isRotatable}
-							isResizable={props.isResizable}
-							metaKey={metaKey}
-							cursorSlice={getCursorSlice(
-								(Math.round(currentRotation.z / 45) + rotationClasses.length + 1) %
-									rotationClasses.length
-							)}
-						/>
-						<HandleBottomLeft
-							onMouseDown={metaKey ? handleMouseDown : setBottomLeftDown}
-							isRotatable={props.isRotatable}
-							isResizable={props.isResizable}
-							metaKey={metaKey}
-							cursorSlice={getCursorSlice(
-								(Math.round(currentRotation.z / 45) + rotationClasses.length + 3) %
-									rotationClasses.length
-							)}
-						/>
-						<HandleTopLeft
-							onMouseDown={metaKey ? handleMouseDown : setTopLeftDown}
-							isRotatable={props.isRotatable}
-							isResizable={props.isResizable}
-							metaKey={metaKey}
-							cursorSlice={getCursorSlice(
-								(Math.round(currentRotation.z / 45) + rotationClasses.length + 5) %
-									rotationClasses.length
-							)}
-						/>
-					</Handles>
+				{(isResizable || isRotatable) && (
+					<PropProvider
+						value={{
+							getCursorSlice,
+							handleRotationDown,
+							isDraggable,
+							isResizable,
+							isRotatable,
+							metaKey
+						}}>
+						<Handles>
+							{handles.map(handle => (
+								<Handle key={handle.variation} {...handle} />
+							))}
+						</Handles>
+					</PropProvider>
 				)}
 			</Wrapper>
 		);
@@ -711,7 +600,6 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 
 Box.defaultProps = {
 	as: "div",
-	shouldSnap: [],
 	position: {
 		x: 0,
 		y: 0
@@ -721,9 +609,10 @@ Box.defaultProps = {
 		y: 0,
 		z: 0
 	},
+	scale: 1,
+	shouldSnap: [],
 	size: {
 		height: "auto",
 		width: "auto"
-	},
-	scale: 1
+	}
 };

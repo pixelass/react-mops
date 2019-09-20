@@ -136,4 +136,52 @@ export namespace Mops {
 		scale?: number;
 		as?: keyof JSX.IntrinsicElements | React.ComponentType;
 	}
+	export enum HandleVariations {
+		e,
+		se,
+		s,
+		sw,
+		w,
+		nw,
+		n,
+		ne
+	};
+	export type HandleVariation = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
+	export interface HandleProps {
+		ref?: React.Ref<HTMLAnchorElement>;
+		children?: React.ReactChild | React.ReactChild[];
+		style?: React.CSSProperties;
+		variation: Mops.HandleVariation;
+		isResizable?: boolean;
+		isRotatable?: boolean;
+		metaKey?: boolean;
+		onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+		onMouseDown?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+		onMouseUp?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+		onMouseMove?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+	}
+
+	export interface WrapperProps {
+		children?: React.ReactNode;
+		isDown?: boolean;
+		as?: keyof JSX.IntrinsicElements | React.ComponentType<any>;
+		style?: React.CSSProperties;
+		ref?: React.Ref<HTMLElement>;
+	}
+
+	export interface ContentProps {
+		children?: React.ReactNode;
+		onMouseDown?: (e: React.MouseEvent) => void;
+		style?: React.CSSProperties;
+		ref?: React.Ref<HTMLDivElement>;
+	}
+
+	export interface ProviderProps {
+		isResizable?: boolean;
+		isRotatable?: boolean;
+		isDraggable?: boolean;
+		getCursorSlice?: (n:  number) => number;
+		handleRotationDown?: (e: React.MouseEvent) => void;
+		metaKey?: boolean;
+	}
 }
