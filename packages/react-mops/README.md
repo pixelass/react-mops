@@ -34,14 +34,20 @@ to an Element as seen in design software like Photoshop, Sketch any many others.
   * [x] Shift key: retain aspect-ratio
   * [ ] Snapping
   * [ ] Touch support
+  * [ ] Keyboard support
+  * [ ] A11y
 * [x] Rotate
   * [x] Meta key: activate rotation
   * [x] Shift key: rotate in steps of 15 deg
   * [ ] Snapping
   * [ ] Touch support
+  * [ ] Keyboard support
+  * [ ] A11y
 * [x] Drag
   * [x] Snapping
   * [ ] Touch support
+  * [ ] Keyboard support
+  * [ ] A11y
 
 ## Installation
 
