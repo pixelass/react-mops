@@ -12,7 +12,10 @@ export const {Provider: PropProvider, Consumer: PropConsumer} = React.createCont
 	metaKey: false
 });
 
-const HandleBase: React.ForwardRefExoticComponent<Mops.HandleProps> = React.forwardRef(
+const HandleBase: React.RefForwardingComponent<
+	HTMLAnchorElement,
+	Mops.HandleProps
+> = React.forwardRef(
 	(
 		{children, style, onClick, onMouseDown, variation, ...props},
 		ref: React.Ref<HTMLAnchorElement>
@@ -33,6 +36,8 @@ const HandleBase: React.ForwardRefExoticComponent<Mops.HandleProps> = React.forw
 					const rotationSlice = rotationCursors[cursorSlice];
 					const resizeSlice = resizeCursors[cursorSlice % resizeCursors.length];
 					const componentStyle: React.CSSProperties = {
+						height: 20,
+						width: 20,
 						...style,
 						cursor: metaKey
 							? isRotatable
@@ -44,10 +49,9 @@ const HandleBase: React.ForwardRefExoticComponent<Mops.HandleProps> = React.forw
 							: isResizable
 							? resizeSlice
 							: "default",
-						height: 20,
+						pointerEvents: "all",
 						position: "absolute",
 						visibility: "visible",
-						width: 20,
 						zIndex: 2
 					};
 
@@ -68,18 +72,21 @@ const HandleBase: React.ForwardRefExoticComponent<Mops.HandleProps> = React.forw
 	}
 );
 
-const HandleMarker: React.FunctionComponent = ({children}) => (
+const HandleMarker: React.FunctionComponent<{style?: React.CSSProperties}> = ({
+	children,
+	style
+}) => (
 	<span
 		style={{
 			background: "white",
 			boxShadow: "0 0 0 1px black",
 			height: "5px",
 			left: "50%",
-			pointerEvents: "none",
 			position: "absolute",
 			top: "50%",
 			transform: "translate(-50%, -50%)",
-			width: "5px"
+			width: "5px",
+			...(style || {})
 		}}>
 		{children}
 	</span>
@@ -87,61 +94,86 @@ const HandleMarker: React.FunctionComponent = ({children}) => (
 
 const variations = {
 	e: {
-		marginTop: -10,
 		right: -10,
-		top: "50%"
+		top: "50%",
+		transform: "translateY(-50%)",
+		width: 20
 	},
 	n: {
+		height: 20,
 		left: "50%",
-		marginLeft: -10,
-		top: -10
+		top: -10,
+		transform: "translateX(-50%)"
 	},
 	ne: {
+		height: 20,
 		right: -10,
-		top: -10
+		top: -10,
+		width: 20
 	},
 	nw: {
+		height: 20,
 		left: -10,
-		top: -10
+		top: -10,
+		width: 20
 	},
 	s: {
 		bottom: -10,
+		height: 20,
 		left: "50%",
-		marginLeft: -10
+		transform: "translateX(-50%)"
 	},
 	se: {
 		bottom: -10,
-		marginTop: -10,
-		right: -10
+		height: 20,
+		right: -10,
+		width: 20
 	},
 	sw: {
 		bottom: -10,
-		left: -10
+		height: 20,
+		left: -10,
+		width: 20
 	},
 	w: {
 		left: -10,
-		marginTop: -10,
-		top: "50%"
+		top: "50%",
+		transform: "translateY(-50%)",
+		width: 20
 	}
 };
 
-export const Handle: React.ForwardRefExoticComponent<
-	Mops.HandleProps & {variation: Mops.HandleVariation}
-> = React.forwardRef(({variation, style, ...props}, ref) => {
+export const Handle: React.RefForwardingComponent<
+	HTMLAnchorElement,
+	Mops.HandleProps & {variation: Mops.HandleVariation; full?: boolean}
+> = React.forwardRef(({variation, style, marker: Marker, full, ...props}, ref) => {
 	return (
 		<HandleBase
 			{...props}
 			variation={variation}
-			style={{...(style || {}), ...variations[variation]}}
+			style={{
+				...(style || {}),
+				...(full ? {height: "100%", width: "100%"} : {}),
+				...variations[variation]
+			}}
 			ref={ref}>
-			<HandleMarker />
+			<Marker
+				style={{
+					pointerEvents: "none"
+				}}
+			/>
 		</HandleBase>
 	);
 });
 
-export const Handles: React.FunctionComponent<{style?: React.CSSProperties}> = ({
+Handle.defaultProps = {
+	marker: HandleMarker
+};
+
+export const Handles: React.FunctionComponent<{style?: React.CSSProperties; draw?: boolean}> = ({
 	children,
 	style,
+	draw,
 	...props
 }) => (
 	<div
@@ -149,51 +181,76 @@ export const Handles: React.FunctionComponent<{style?: React.CSSProperties}> = (
 		style={{
 			...(style || {}),
 			bottom: 0,
+			boxShadow: draw ? "0 0 0 1px hsla(200, 100%, 25%, 0.75)" : undefined,
 			left: 0,
+			pointerEvents: "none",
 			position: "absolute",
 			right: 0,
 			top: 0,
-			visibility: "hidden"
+			zIndex: 2
 		}}>
 		{children}
 	</div>
 );
 
-export const Wrapper: React.ForwardRefExoticComponent<Mops.WrapperProps> = React.forwardRef(
-	({children, isDown, style, as: As, ...props}, ref: React.Ref<HTMLElement>) => (
-		<As
-			{...props}
-			ref={ref as React.Ref<HTMLElement>}
-			style={{
-				...(style || {}),
-				boxShadow: "0 0 0 1px hsla(200, 100%, 25%, 0.75)",
-				display: "inline-flex",
-				left: 0,
-				position: "absolute",
-				top: 0,
-				zIndex: isDown ? 1 : "initial"
-			}}>
-			{children}
-		</As>
-	)
-);
+export const Wrapper: React.RefForwardingComponent<
+	HTMLElement,
+	Mops.WrapperProps
+> = React.forwardRef(({children, isDown, style, as: As, ...props}, ref: React.Ref<HTMLElement>) => (
+	<As
+		{...props}
+		ref={ref as React.Ref<HTMLElement>}
+		style={{
+			...(style || {}),
+			alignContent: "center",
+			alignItems: "center",
+			display: "flex",
+			justifyContent: "center",
+			left: 0,
+			pointerEvents: "none",
+			position: "absolute",
+			top: 0,
+			zIndex: isDown ? 1 : "initial"
+		}}>
+		{children}
+	</As>
+));
 
-export const Content: React.ForwardRefExoticComponent<Mops.ContentProps> = React.forwardRef(
-	({children, onMouseDown, style, ...props}, ref: React.Ref<HTMLDivElement>) => (
-		<div
-			{...props}
-			onMouseDown={onMouseDown}
-			ref={ref as React.Ref<HTMLDivElement>}
-			style={{
-				...(style || {}),
-				cursor: onMouseDown && "move",
-				flex: 1,
-				maxHeight: "100%",
-				maxWidth: "100%",
-				overflow: "hidden",
-				zIndex: 1
-			}}>
-			{children}
-		</div>
-	)
-);
+export const Content: React.RefForwardingComponent<
+	HTMLDivElement,
+	Mops.ContentProps
+> = React.forwardRef(({children, onMouseDown, style, ...props}, ref: React.Ref<HTMLDivElement>) => (
+	<div
+		{...props}
+		onMouseDown={onMouseDown}
+		ref={ref as React.Ref<HTMLDivElement>}
+		style={{
+			...(style || {}),
+			cursor: onMouseDown && "move",
+			maxHeight: "100%",
+			maxWidth: "100%",
+			pointerEvents: "all",
+			zIndex: 1
+		}}>
+		{children}
+	</div>
+));
+
+export const BoundingBox: React.RefForwardingComponent<
+	HTMLDivElement,
+	{style?: React.CSSProperties; draw?: boolean}
+> = React.forwardRef(({children, style, draw, ...props}, ref: React.Ref<HTMLDivElement>) => (
+	<div
+		{...props}
+		ref={ref as React.Ref<HTMLDivElement>}
+		style={{
+			boxShadow: draw ? "0 0 0 1px hsla(200, 100%, 25%, 0.75)" : undefined,
+			height: "100%",
+			pointerEvents: "none",
+			position: "absolute",
+			width: "100%",
+			...(style || {})
+		}}>
+		{children}
+	</div>
+));

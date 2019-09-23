@@ -4,7 +4,7 @@
   "description": "Modify Orientation Position Size",
   "keywords": [
     "coordinates",
-    "dimesion",
+    "dimension",
     "drag",
     "draggable",
     "edit",
@@ -55,8 +55,11 @@
     "prewatch": "ngineer clean"
   },
   "dependencies": {
-    "@types/react": "16.9.2",
-    "ts-lib": "0.0.5"
+    "@types/react": "^16.9.2",
+    "@types/uuid": "^3.4.5",
+    "immutability-helper": "^3.0.1",
+    "ts-lib": "^0.0.5",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "@ngineer/cli": "1.3.1",

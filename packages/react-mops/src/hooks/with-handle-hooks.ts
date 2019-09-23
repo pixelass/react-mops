@@ -2,16 +2,21 @@ import React from "react";
 import {withAlt, withAspectRatio, withRotation} from "../utils";
 import {useHandle} from "./handle-hooks";
 
-export const useWithHandle = ({
-	setInitialPosition,
-	setInitialSize,
-	setPosition,
-	setSize,
-	currentRotation,
-	scale,
-	contentRef,
-	isResizable
-}) =>
+export const useWithHandle = (
+	{
+		setInitialPosition,
+		setInitialSize,
+		setPosition,
+		setSize,
+		currentRotation,
+		scale,
+		contentRef,
+		isResizable,
+		minHeight,
+		minWidth
+	},
+	deps = []
+) =>
 	React.useCallback(
 		({handleSize, handlePosition}) => {
 			return useHandle({
@@ -20,17 +25,33 @@ export const useWithHandle = ({
 					if (!isResizable) {
 						return state;
 					}
+					// const sizeState = handleSize({x, y}, altKey, shiftKey);
+					// const nextSize = typeof sizeState === "function" ? sizeState(state) : sizeState;
+					// const finalSize = {
+					// 	height: Math.max(minHeight, nextSize.height),
+					// 	width: Math.max(minWidth, nextSize.width)
+					// }
+					// const stopY = finalSize.height === minHeight;
+					// const stopX = finalSize.width === minWidth;
 					const positionState = handlePosition({x, y}, altKey, shiftKey);
-					return typeof positionState === "function"
-						? positionState(state)
-						: positionState;
+					const nextPosition =
+						typeof positionState === "function" ? positionState(state) : positionState;
+					return nextPosition;
+					// return {
+					// 	x: stopY ? state.x : nextPosition.x,
+					// 	y: stopX ? state.y : nextPosition.y
+					// };
 				},
 				handleSize: ({x, y}, altKey, shiftKey) => state => {
 					if (!isResizable) {
 						return state;
 					}
 					const sizeState = handleSize({x, y}, altKey, shiftKey);
-					return typeof sizeState === "function" ? sizeState(state) : sizeState;
+					const nextSize = typeof sizeState === "function" ? sizeState(state) : sizeState;
+					return {
+						height: Math.max(minHeight, nextSize.height),
+						width: Math.max(minWidth, nextSize.width)
+					};
 				},
 				rotation: currentRotation,
 				scale,
@@ -47,7 +68,9 @@ export const useWithHandle = ({
 			setSize,
 			currentRotation,
 			scale,
-			contentRef
+			contentRef,
+			isResizable,
+			...deps
 		]
 	);
 export const useWithCornerHandle = ({withHandle, currentRotation, initialPosition, initialSize}) =>

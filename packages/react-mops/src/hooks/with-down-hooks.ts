@@ -4,6 +4,7 @@ import {useMouseMove, useMouseMoveEvent} from "./mouse-event-hooks";
 export const useWithDown = ({
 	handleMouse,
 	handleMouseEvent,
+	hideGuides,
 	scale,
 	setAdditionalAngle,
 	setInitialPosition,
@@ -16,6 +17,7 @@ export const useWithDown = ({
 			const withSnapLogic = handleMouse(p);
 			setPosition(withSnapLogic);
 			setInitialPosition(withSnapLogic);
+			hideGuides();
 		},
 		p => {
 			const withSnapLogic = handleMouse(p);

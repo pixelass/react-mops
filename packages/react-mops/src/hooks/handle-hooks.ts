@@ -28,14 +28,16 @@ export const useHandle = ({
 }: Mops.UseHandleProps) => {
 	const [isDown, setDown] = useMouseMove(
 		(position: Mops.PositionModel, altKey: boolean, shiftKey: boolean) => {
-			setSize(handleSize(position, altKey, shiftKey));
-			setInitialSize(handleSize(position, altKey, shiftKey));
+			const nextSize = handleSize(position, altKey, shiftKey);
+			setSize(nextSize);
+			setInitialSize(nextSize);
 			const nextPosition = handlePosition(position, altKey, shiftKey);
 			setPosition(nextPosition);
 			setInitialPosition(nextPosition);
 		},
 		(position: Mops.PositionModel, altKey: boolean, shiftKey: boolean) => {
-			setSize(handleSize(position, altKey, shiftKey));
+			const nextSize = handleSize(position, altKey, shiftKey);
+			setSize(nextSize);
 			const nextPosition = handlePosition(position, altKey, shiftKey);
 			setPosition(nextPosition);
 		},

@@ -2,14 +2,40 @@ import React from "react";
 import {rotationCursors} from "../cursors";
 import {to360} from "../utils";
 
+const OSX = "OSX";
+const WINDOWS = "WINDOWS";
+const LINUX = "LINUX";
+const UNIX = "UNIX";
+const NODE = "UNIX";
+
+const getOS = () => {
+	if ("navigator" in global) {
+		if (navigator.appVersion.indexOf("Win") !== -1) {
+			return WINDOWS;
+		}
+		if (navigator.appVersion.indexOf("Mac") !== -1) {
+			return OSX;
+		}
+		if (navigator.appVersion.indexOf("X11") !== -1) {
+			return UNIX;
+		}
+		if (navigator.appVersion.indexOf("Linux") !== -1) {
+			return LINUX;
+		}
+	}
+	return NODE;
+};
+
+const isOSX = () => getOS() === OSX;
 /**
  *
  */
 export const useMeta = () => {
 	const [metaKey, setMetaKey] = React.useState(false);
+	const key = isOSX ? "Meta" : "Control";
 	const handleKeyDown = React.useCallback(
 		(e: KeyboardEvent) => {
-			if (e.key === "Meta") {
+			if (e.key === key) {
 				setMetaKey(true);
 			}
 		},
@@ -18,7 +44,7 @@ export const useMeta = () => {
 
 	const handleKeyUp = React.useCallback(
 		(e: KeyboardEvent) => {
-			if (e.key === "Meta") {
+			if (e.key === key) {
 				setMetaKey(false);
 			}
 		},
@@ -67,17 +93,7 @@ export const useHandler = (handler, {currentSize, currentPosition, currentRotati
 			handler({position: currentPosition, rotation: currentRotation, size: currentSize}),
 		[handler, currentSize, currentPosition, currentRotation]
 	);
-export const useBoxStyle = (currentPosition, currentRotation, currentSize) =>
-	React.useMemo(
-		() => ({
-			...currentSize,
-			transform: `
-				translate3d(${currentPosition.x}px, ${currentPosition.y}px, 0)
-				translate3d(-50%, -50%, 0) rotate3d(0, 0, 1, ${currentRotation.z}deg)
-			`
-		}),
-		[currentPosition, currentRotation, currentSize]
-	);
+
 export const useLoaded = setLoaded =>
 	React.useEffect(() => {
 		setLoaded(true);

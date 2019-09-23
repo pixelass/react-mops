@@ -1,6 +1,6 @@
 import React from "react";
 import {Mops} from "../types";
-import {coordinatesToDeg, to360, withRotation} from "../utils";
+import {coordinatesToDeg, degToRad, getBoundingBox, to360, withRotation} from "../utils";
 
 /**
  * Mousemove hook
@@ -192,9 +192,18 @@ export const useHandleMouseEvent = ({additionalAngle, contentRef, initialRotatio
 				rotation: newRotation
 			};
 		},
-		[contentRef, initialRotation]
+		[contentRef, initialRotation, isRotatable]
 	);
-export const useHandleMouse = ({currentRotation, currentSize, initialPosition, shouldSnap}) =>
+export const useHandleMouse = ({
+	currentRotation,
+	currentSize,
+	initialPosition,
+	shouldSnap,
+	guideRequests,
+	guides,
+	hideGuides,
+	showGuides
+}) =>
 	React.useCallback(
 		({x, y}) => {
 			const newPosition = {
@@ -204,12 +213,20 @@ export const useHandleMouse = ({currentRotation, currentSize, initialPosition, s
 			return shouldSnap.reduce(
 				(model, fn) => ({
 					...(fn(
-						{position: newPosition, size: currentSize, rotation: currentRotation},
+						{
+							position: newPosition,
+							rotation: currentRotation,
+							size: getBoundingBox({
+								...currentSize,
+								angle: degToRad(currentRotation.z)
+							})
+						},
+						{guideRequests, guides, hideGuides, showGuides},
 						model
 					) as Mops.SnapHandler)
 				}),
 				newPosition
 			) as Mops.PositionModel;
 		},
-		[currentSize, currentRotation, initialPosition]
+		[currentSize, currentRotation, initialPosition, shouldSnap, showGuides, hideGuides]
 	);

@@ -1,8 +1,7 @@
 import React from "react";
-import {Content, Handle, Handles, PropProvider, Wrapper} from "./elements";
+import {BoundingBox, Content, Handle, Handles, PropProvider, Wrapper} from "./elements";
 import {
 	listenRR,
-	useBoxStyle,
 	useCursorSlice,
 	useDown,
 	useDrag,
@@ -19,15 +18,26 @@ import {
 	useWithHandle
 } from "./hooks";
 import {Mops} from "./types";
+import {degToRad, getBoundingBox} from "./utils";
 
-export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forwardRef(
+export const Box: React.RefForwardingComponent<
+	HTMLElement,
+	Mops.BoxProps & Mops.GuidesContext
+> = React.forwardRef(
 	(
 		{
 			as,
 			children,
+			className,
+			drawBoundingBox,
+			drawBox,
 			isResizable,
 			isRotatable,
 			isDraggable,
+			fullHandles,
+			marker,
+			minHeight,
+			minWidth,
 			onDrag,
 			onDragStart,
 			onDragEnd,
@@ -40,8 +50,13 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 			position,
 			rotation,
 			scale,
+			showGuides,
+			hideGuides,
+			guides,
+			guideRequests,
 			shouldSnap,
 			size,
+			style,
 			...props
 		},
 		ref
@@ -86,6 +101,8 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 			contentRef,
 			currentRotation,
 			isResizable,
+			minHeight,
+			minWidth,
 			scale,
 			setInitialPosition,
 			setInitialSize,
@@ -125,8 +142,12 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 		const handleMouse = useHandleMouse({
 			currentRotation,
 			currentSize,
+			guideRequests,
+			guides,
+			hideGuides,
 			initialPosition,
-			shouldSnap
+			shouldSnap,
+			showGuides
 		});
 		const handleMouseEvent = useHandleMouseEvent({
 			additionalAngle,
@@ -137,6 +158,7 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 		const {handleRotationDown, isDown, isRotationDown, setDown} = useWithDown({
 			handleMouse,
 			handleMouseEvent,
+			hideGuides,
 			scale,
 			setAdditionalAngle,
 			setInitialPosition,
@@ -155,8 +177,20 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 			setTopLeftDown,
 			setTopRightDown
 		});
-		const style = useBoxStyle(currentPosition, currentRotation, currentSize);
-
+		const wrapperStyle = {
+			...currentSize,
+			transform: `translate3d(${currentPosition.x}px, ${currentPosition.y}px, 0) translate3d(-50%, -50%, 0)`
+		};
+		const boxStyle = {
+			...getBoundingBox({
+				...currentSize,
+				angle: degToRad(currentRotation.z)
+			})
+		};
+		const contentStyle = {
+			...currentSize,
+			transform: `rotate3d(0, 0, 1, ${currentRotation.z}deg)`
+		};
 		useInitialSize({contentRef, setInitialSize, setSize});
 		listenRR({
 			currentPosition,
@@ -199,11 +233,17 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 		});
 		useDrag({loaded, isDown, handleDragEnd, handleDragStart});
 		useLoaded(setLoaded);
-
 		return (
-			<Wrapper ref={ref as React.Ref<HTMLElement>} as={as} style={style} isDown={isDown}>
+			<Wrapper
+				ref={ref as React.Ref<HTMLElement>}
+				as={as}
+				style={{...(style || {}), ...wrapperStyle}}
+				isDown={isDown}
+				className={className}>
+				<BoundingBox style={boxStyle} draw={drawBoundingBox} />
 				<Content
 					ref={contentRef as React.Ref<HTMLDivElement>}
+					style={contentStyle}
 					onMouseDown={!metaKey && isDraggable ? setDown : undefined}>
 					{children}
 				</Content>
@@ -217,9 +257,14 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 							isRotatable,
 							metaKey
 						}}>
-						<Handles>
+						<Handles style={contentStyle} draw={drawBox}>
 							{handles.map(handle => (
-								<Handle key={handle.variation} {...handle} />
+								<Handle
+									key={handle.variation}
+									{...handle}
+									marker={marker}
+									full={fullHandles}
+								/>
 							))}
 						</Handles>
 					</PropProvider>
@@ -231,6 +276,10 @@ export const Box: React.ForwardRefExoticComponent<Mops.BoxProps> = React.forward
 
 Box.defaultProps = {
 	as: "div",
+	drawBoundingBox: false,
+	drawBox: true,
+	minHeight: 40,
+	minWidth: 40,
 	position: {
 		x: 0,
 		y: 0
