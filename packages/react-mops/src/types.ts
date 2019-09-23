@@ -1,5 +1,6 @@
 import React from "react";
 
+// tslint:disable-next-line:no-namespace
 export namespace Mops {
 	/**
 	 * @typedef InitialSizeModel
@@ -79,10 +80,13 @@ export namespace Mops {
 	 * @typedef SnapHandler
 	 * @type {function}
 	 * @param {BoundingBox} boundingBox
+	 * @param {Partial<GuidesContext>} guideContext
+	 * @param {PositionModel} [model]
 	 *
 	 */
 	export type SnapHandler = (
 		boundingBox: BoundingBox,
+		guideContext: Partial<GuidesContext>,
 		model?: PositionModel
 	) => Partial<PositionModel>;
 
@@ -98,6 +102,7 @@ export namespace Mops {
 	 * @typedef BoxProps
 	 * @type {object}
 	 * @property {SnapHandler} [shouldSnap]
+	 * @property {React.ComponentType} [marker]
 	 * @property {EventHandler} [onResize]
 	 * @property {EventHandler} [onResizeStart]
 	 * @property {EventHandler} [onResizeEnd]
@@ -117,6 +122,10 @@ export namespace Mops {
 	 */
 	export interface BoxProps {
 		shouldSnap?: SnapHandler[];
+		marker?: React.ComponentType;
+		style?: React.CSSProperties;
+		className?: string;
+		ref?: React.Ref<HTMLElement>;
 		onResize?: EventHandler;
 		onResizeStart?: EventHandler;
 		onResizeEnd?: EventHandler;
@@ -129,11 +138,14 @@ export namespace Mops {
 		position?: PositionModel;
 		rotation?: RotationModel;
 		size?: InitialSizeModel;
+		fullHandles?: boolean;
+		drawBox?: boolean;
+		minHeight?: number;
+		minWidth?: number;
+		drawBoundingBox?: boolean;
 		isDraggable?: boolean;
 		isResizable?: boolean;
 		isRotatable?: boolean;
-		children: React.ReactChild | React.ReactChild[];
-		ref?: React.Ref<HTMLElement>;
 		scale?: number;
 		as?: keyof JSX.IntrinsicElements | React.ComponentType;
 	}
@@ -149,13 +161,13 @@ export namespace Mops {
 	}
 	export type HandleVariation = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
 	export interface HandleProps {
-		ref?: React.Ref<HTMLAnchorElement>;
-		children?: React.ReactChild | React.ReactChild[];
 		style?: React.CSSProperties;
 		variation: Mops.HandleVariation;
 		isResizable?: boolean;
 		isRotatable?: boolean;
 		metaKey?: boolean;
+		ref?: React.Ref<HTMLAnchorElement>;
+		marker?: React.ComponentType<{style?: React.CSSProperties}>;
 		onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 		onMouseDown?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 		onMouseUp?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
@@ -163,18 +175,17 @@ export namespace Mops {
 	}
 
 	export interface WrapperProps {
-		children?: React.ReactNode;
+		className?: string;
 		isDown?: boolean;
 		as?: keyof JSX.IntrinsicElements | React.ComponentType<any>;
-		style?: React.CSSProperties;
 		ref?: React.Ref<HTMLElement>;
+		style?: React.CSSProperties;
 	}
 
 	export interface ContentProps {
-		children?: React.ReactNode;
 		onMouseDown?: (e: React.MouseEvent) => void;
-		style?: React.CSSProperties;
 		ref?: React.Ref<HTMLDivElement>;
+		style?: React.CSSProperties;
 	}
 
 	export interface ProviderProps {
@@ -208,5 +219,38 @@ export namespace Mops {
 		scale: number;
 		rotation?: Mops.RotationModel;
 		contentRef?: React.RefObject<HTMLElement>;
+	}
+
+	export interface GuideProps {
+		showGuides?: boolean;
+	}
+
+	export interface Guide {
+		visible?: boolean;
+		uuid: string;
+		x1: number;
+		x2: number;
+		y1: number;
+		y2: number;
+	}
+
+	export interface GuideRequest {
+		uuid: string;
+		x?: number;
+		y?: number;
+	}
+
+	export interface ContainerSize {
+		height: number;
+		width: number;
+	}
+
+	export interface GuidesContext {
+		guides: Guide[];
+		guideRequests: GuideRequest[];
+		addGuides: (guideModels: Guide[]) => void;
+		removeGuides: (uuids?: string[]) => void;
+		showGuides: (guides?: string[]) => void;
+		hideGuides: (guides?: string[]) => void;
 	}
 }

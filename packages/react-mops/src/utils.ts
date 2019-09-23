@@ -118,3 +118,9 @@ export const getRotation = (
 		})
 	};
 };
+export const getBoundingBox = ({height, width, angle}) => ({
+	height: Math.abs(Math.sin(angle)) * width + Math.abs(Math.cos(angle)) * height,
+	width: Math.abs(Math.sin(angle)) * height + Math.abs(Math.cos(angle)) * width
+});
+
+export const inRange = (value: number, min: number, max: number) => value >= min && value <= max;
