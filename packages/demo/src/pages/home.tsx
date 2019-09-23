@@ -1,300 +1,212 @@
 import React from "react";
-import {Box, coordinatesToDeg, Mops, resizeClasses, rotationClasses} from "react-mops";
-import styled, {css, ThemeProvider} from "styled-components";
-
-const theme = {};
-
-const Wrapper = styled.div<{grid?: {x: number; y: number}}>`
-	position: relative;
-	height: 500px;
-	width: 500px;
-	margin: 3rem;
-	box-shadow: 0 0 0 1px black;
-	${({grid}) =>
-		grid &&
-		css`
-			background-image: linear-gradient(to right, hsla(0, 0%, 0%, 0.1) 1px, transparent 1px),
-				linear-gradient(to bottom, hsla(0, 0%, 0%, 0.1) 1px, transparent 1px);
-			background-size: ${grid.x}px ${grid.y}px;
-			// background-position: ${grid.x / 2}px ${grid.y / 2}px;
-		`};
-`;
-
-const Inner = styled.div<{backgroundColor: string}>`
-	box-sizing: border-box;
-	padding: 10px;
-	min-height: 100%;
-	min-width: 100%;
-	background: ${({backgroundColor}) => backgroundColor};
-	font-family: sans-serif;
-	display: flex;
-	align-items: center;
-	align-content: center;
-	justify-content: center;
-	text-align: center;
-	font-size: 25px;
-`;
-
-const Examples = styled.div`
-	display: flex;
-	flex-wrap: wrap;
-`;
-
-const toBounds = ({top, right, bottom, left}) => ({position, size}, model = position) => {
-	const snap: Partial<Mops.PositionModel> = {
-		x: Math.max(left + size.width / 2, Math.min(right - size.width / 2, model.x)),
-		y: Math.max(top + size.height / 2, Math.min(bottom - size.height / 2, model.y))
-	};
-	return snap;
-};
-
-const toGrid = ({x = 1, y = 1}) => ({position, size}, model = position) => {
-	const snap: Partial<Mops.PositionModel> = {
-		x: Math.round(model.x / x) * x,
-		y: Math.round(model.y / y) * y
-	};
-	return snap;
-};
+import {
+	GuidedBox as Box,
+	Guides,
+	GuidesProvider,
+	Mops,
+	to360,
+	toBounds,
+	toGrid,
+	toGuides
+} from "react-mops";
+import {ThemeProvider} from "styled-components";
+import {containerSize, fixedGuides, gridSize} from "../constants";
+import {
+	Button,
+	ButtonWrapper,
+	Container,
+	Example,
+	Examples,
+	Headline,
+	Inner,
+	InvisibleMarker,
+	StyledBox, SubHeadline, Title,
+	Wrapper
+} from "../elements";
 
 export function Home() {
-	const rotatableRef = React.useRef<HTMLElement>();
-	const resizableRef = React.useRef<HTMLElement>();
-	const allRef = React.useRef<HTMLElement>();
-	const draggableRef = React.useRef<HTMLElement>();
-	const [windowPointer, setWindowPointer] = React.useState({
-		clientX: 0,
-		clientY: 0
-	});
-	const handleMouseMove = React.useCallback(
-		(e: MouseEvent) => {
-			setWindowPointer({
-				clientX: e.clientX,
-				clientY: e.clientY
-			});
-		},
-		[setWindowPointer]
+	const [isDraggable, setDraggable] = React.useState(true);
+	const [isResizable, setResizable] = React.useState(false);
+	const [isRotatable, setRotatable] = React.useState(false);
+	const [showMarkers, setMarkers] = React.useState(true);
+	const [showBox, setBox] = React.useState(false);
+	const [showBoundingBox, setBoundingBox] = React.useState(false);
+	const [hasGrid, setGrid] = React.useState(false);
+	const [hasBounds, setBounds] = React.useState(true);
+	const [hasGuides, setGuides] = React.useState(false);
+	const shouldSnap: Mops.SnapHandler[] = React.useMemo(
+		() =>
+			[
+				hasGrid ? toGrid(gridSize) : undefined,
+				hasGuides
+					? toGuides({
+							threshold: {
+								x: gridSize.x / 2,
+								y: gridSize.y / 2
+							}
+					  })
+					: undefined,
+				hasBounds
+					? toBounds({
+							bottom: containerSize.height,
+							left: 0,
+							right: containerSize.width,
+							top: 0
+					  })
+					: undefined
+			].filter(Boolean),
+		[hasBounds, hasGrid, hasGuides, isDraggable, isResizable, isRotatable]
 	);
-	const removeClasses = React.useCallback((e: MouseEvent) => {
-		document.body.classList.remove(...rotationClasses, ...resizeClasses);
-	}, []);
-	React.useEffect(() => {
-		window.addEventListener("mousemove", handleMouseMove);
-		return () => {
-			window.removeEventListener("mousemove", handleMouseMove);
-		};
-	}, [handleMouseMove]);
-	React.useEffect(() => {
-		window.addEventListener("blur", removeClasses);
-		window.addEventListener("focus", removeClasses);
-		return () => {
-			window.removeEventListener("blur", removeClasses);
-			window.removeEventListener("focus", removeClasses);
-		};
-	}, [removeClasses]);
 	return (
-		<ThemeProvider theme={theme}>
-			<Examples>
+		<ThemeProvider theme={{}}>
+			<React.Fragment>
 				<Wrapper>
-					<h3>Resizable</h3>
-					<p>
-						<code>Alt</code> to resize in opposite directions
-					</p>
-					<p>
-						<code>Shift</code> to retain the aspect-ratio
-					</p>
-					<p>
-						<code>Alt + Shift</code> to resize in opposite directions and retain the
-						aspect-ratio
-					</p>
-					<Box
-						ref={resizableRef as React.Ref<HTMLElement>}
-						isResizable
-						onResizeEnd={() => {
-							document.body.classList.remove(...resizeClasses);
-						}}
-						onResize={() => {
-							if (resizableRef && resizableRef.current) {
-								const {clientX, clientY} = windowPointer;
-								const {
-									left,
-									top,
-									width,
-									height
-								} = resizableRef.current.getBoundingClientRect();
-								const pointer = {x: clientX - left, y: clientY - top};
-								const center = {x: width / 2, y: height / 2};
-								const deg = coordinatesToDeg(pointer, center);
-								const rotationStep =
-									(Math.round(deg / 45) + rotationClasses.length) %
-									rotationClasses.length;
-								document.body.classList.remove(...resizeClasses);
-								document.body.classList.add(
-									resizeClasses[rotationStep % resizeClasses.length]
-								);
-							}
-						}}
-						position={{
-							x: 250,
-							y: 250
-						}}
-						size={{
-							height: 100,
-							width: 100
-						}}>
-						<Inner backgroundColor={`hsl(0, 100%, 30%)`} />
-					</Box>
+					<Title>M.O.P.S</Title>
+					<Headline>Orientation</Headline>
+					<ul>
+						<li>
+							Press <code>Cmd</code> to enable rotation.
+						</li>
+						<li>Hold and drag a handle.</li>
+						<li>
+							Press <code>Shift</code> to rotate in steps of 15°.
+						</li>
+					</ul>
+					<Headline>Position</Headline>
+					<ul>
+						<li>Hold and drag an element.</li>
+					</ul>
+					<Headline>Size</Headline>
+					<ul>
+						<li>Hold and drag a handle.</li>
+						<li>
+							Press <code>Alt</code> to resize opposite sides.
+						</li>
+						<li>
+							Press <code>Shift</code> to retain the aspect-ratio.
+						</li>
+					</ul>
+					<hr/>
+					<SubHeadline>Snapping (onDrag)</SubHeadline>
+					<ButtonWrapper>
+						<Button
+							onClick={() => {
+								setGrid(state => !state);
+							}}
+							isActive={hasGrid}>
+							Grid
+						</Button>
+						<Button
+							onClick={() => {
+								setBounds(state => !state);
+							}}
+							isActive={hasBounds}>
+							Bounds
+						</Button>
+						<Button
+							onClick={() => {
+								setGuides(state => !state);
+							}}
+							isActive={hasGuides}>
+							Guides
+						</Button>
+					</ButtonWrapper>
+					<SubHeadline>Modifiers</SubHeadline>
+					<ButtonWrapper>
+						<Button
+							onClick={() => {
+								setDraggable(state => !state);
+							}}
+							isActive={isDraggable}>
+							Draggable
+						</Button>
+						<Button
+							onClick={() => {
+								setResizable(state => !state);
+							}}
+							isActive={isResizable}>
+							Resizable
+						</Button>
+						<Button
+							onClick={() => {
+								setRotatable(state => !state);
+							}}
+							isActive={isRotatable}>
+							Rotatable
+						</Button>
+					</ButtonWrapper>
+					<SubHeadline>Debug</SubHeadline>
+					<ButtonWrapper>
+						<Button
+							onClick={() => {
+								setBoundingBox(state => !state);
+							}}
+							isActive={showBoundingBox}>
+							Bounding Box
+						</Button>
+						<Button
+							onClick={() => {
+								setBox(state => !state);
+							}}
+							isActive={showBox}>
+							Box
+						</Button>
+						<Button
+							onClick={() => {
+								setMarkers(state => !state);
+							}}
+							isActive={showMarkers}>
+							Handle Markers
+						</Button>
+					</ButtonWrapper>
 				</Wrapper>
-				<Wrapper>
-					<h3>Rotatable</h3>
-					<p>
-						<code>CMD</code> to rotate
-					</p>
-					<p>
-						<code>CMD + Shift</code> to rotate in steps
-					</p>
-					<Box
-						ref={rotatableRef as React.Ref<HTMLElement>}
-						isRotatable
-						onRotateEnd={() => {
-							document.body.classList.remove(...rotationClasses);
-						}}
-						onRotate={() => {
-							if (rotatableRef && rotatableRef.current) {
-								const {clientX, clientY} = windowPointer;
-								const {
-									left,
-									top,
-									width,
-									height
-								} = rotatableRef.current.getBoundingClientRect();
-								const pointer = {x: clientX - left, y: clientY - top};
-								const center = {x: width / 2, y: height / 2};
-								const deg = coordinatesToDeg(pointer, center);
-								const rotationStep =
-									(Math.round(deg / 45) + rotationClasses.length) %
-									rotationClasses.length;
-								document.body.classList.remove(...rotationClasses);
-								document.body.classList.add(
-									rotationClasses[rotationStep % rotationClasses.length]
-								);
-							}
-						}}
-						position={{
-							x: 250,
-							y: 250
-						}}
-						size={{
-							height: 100,
-							width: 100
-						}}>
-						<Inner backgroundColor={`hsl(90, 100%, 30%)`} />
-					</Box>
-				</Wrapper>
-				<Wrapper>
-					<h3>Draggable</h3>
-					<Box
-						ref={draggableRef as React.Ref<HTMLElement>}
-						shouldSnap={
-							[
-								// toGrid({x: 25, y: 25}),
-								// toBounds({top: 0, right: 500, bottom: 500, left: 0})
-							]
-						}
-						isDraggable
-						position={{
-							x: 250,
-							y: 250
-						}}
-						size={{
-							height: 100,
-							width: 100
-						}}>
-						<Inner backgroundColor={`hsl(180, 100%, 30%)`} />
-					</Box>
-				</Wrapper>
-				<Wrapper>
-					<h3>All combined</h3>
-					<p>
-						<code>CMD</code> to rotate
-					</p>
-					<p>
-						<code>CMD + Shift</code> to rotate in steps
-					</p>
-					<p>
-						<code>Alt</code> to resize in opposite directions
-					</p>
-					<p>
-						<code>Shift</code> to retain the aspect-ratio
-					</p>
-					<p>
-						<code>Alt + Shift</code> to resize in opposite directions and retain the
-						aspect-ratio
-					</p>
-					<Box
-						ref={allRef as React.Ref<HTMLElement>}
-						isRotatable
-						isResizable
-						isDraggable
-						onResizeEnd={() => {
-							document.body.classList.remove(...resizeClasses);
-						}}
-						onResize={() => {
-							if (allRef && allRef.current) {
-								const {clientX, clientY} = windowPointer;
-								const {
-									left,
-									top,
-									width,
-									height
-								} = allRef.current.getBoundingClientRect();
-								const pointer = {x: clientX - left, y: clientY - top};
-								const center = {x: width / 2, y: height / 2};
-								const deg = coordinatesToDeg(pointer, center);
-								const rotationStep =
-									(Math.round(deg / 45) + rotationClasses.length) %
-									rotationClasses.length;
-								document.body.classList.remove(...resizeClasses);
-								document.body.classList.add(
-									resizeClasses[rotationStep % resizeClasses.length]
-								);
-							}
-						}}
-						onRotateEnd={() => {
-							document.body.classList.remove(...rotationClasses);
-						}}
-						onRotate={() => {
-							if (allRef && allRef.current) {
-								const {clientX, clientY} = windowPointer;
-								const {
-									left,
-									top,
-									width,
-									height
-								} = allRef.current.getBoundingClientRect();
-								const pointer = {x: clientX - left, y: clientY - top};
-								const center = {x: width / 2, y: height / 2};
-								const deg = coordinatesToDeg(pointer, center);
-								const rotationStep =
-									(Math.round(deg / 45) + rotationClasses.length) %
-									rotationClasses.length;
-								document.body.classList.remove(...rotationClasses);
-								document.body.classList.add(
-									rotationClasses[rotationStep % rotationClasses.length]
-								);
-							}
-						}}
-						position={{
-							x: 250,
-							y: 250
-						}}
-						size={{
-							height: 100,
-							width: 100
-						}}>
-						<Inner backgroundColor={`hsl(260, 100%, 30%)`} />
-					</Box>
-				</Wrapper>
-			</Examples>
+
+				<Examples>
+					<GuidesProvider
+						guideRequests={hasGuides ? fixedGuides : undefined}
+						containerSize={containerSize}>
+						<Example>
+							<Container
+								withGrid={hasGrid ? gridSize : undefined}
+								hasBounds={hasBounds}>
+								<Guides />
+								{Array(3)
+									.fill(Boolean)
+									.map((x, i) => (
+										<Box
+											key={i}
+											as={StyledBox}
+											drawBoundingBox={showBoundingBox}
+											drawBox={showBox}
+											isDraggable={isDraggable}
+											isResizable={isResizable}
+											isRotatable={isRotatable}
+											minHeight={100}
+											minWidth={100}
+											marker={showMarkers ? undefined : InvisibleMarker}
+											fullHandles={!showMarkers}
+											size={{
+												height: 100 + 41 * (i % 4),
+												width: 100 + 36 * (i % 5)
+											}}
+											position={{
+												x: 120 + 65 * 3 * (i % 6),
+												y: 120 + 32 * 3 * Math.floor(i / 4)
+											}}
+											rotation={{
+												x: 0,
+												y: 0,
+												z: to360(((i % 12) + 1) * 68)
+											}}
+											shouldSnap={shouldSnap}>
+											<Inner />
+										</Box>
+									))}
+							</Container>
+						</Example>
+					</GuidesProvider>
+				</Examples>
+			</React.Fragment>
 		</ThemeProvider>
 	);
 }

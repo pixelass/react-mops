@@ -7,6 +7,18 @@ const {routes} = require("./lib/routes");
 
 module.exports = (env, argv) =>
 	merge(config(env, argv), {
+		module: {
+			rules: [
+				{
+					test: /\.jpg?$/,
+					use: [
+						{
+							loader: "file-loader"
+						}
+					]
+				}
+			]
+		},
 		resolve: {
 			extensions: [".ts", ".tsx", ".mjs", ".js", ".jsx"]
 		},
