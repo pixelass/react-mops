@@ -32,7 +32,7 @@ const isOSX = () => getOS() === OSX;
  */
 export const useMeta = () => {
 	const [metaKey, setMetaKey] = React.useState(false);
-	const key = isOSX ? "Meta" : "Control";
+	const key = isOSX() ? "Meta" : "Control";
 	const handleKeyDown = React.useCallback(
 		(e: KeyboardEvent) => {
 			if (e.key === key) {
