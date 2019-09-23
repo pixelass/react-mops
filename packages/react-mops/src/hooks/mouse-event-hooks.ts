@@ -195,6 +195,7 @@ export const useHandleMouseEvent = ({additionalAngle, contentRef, initialRotatio
 		[contentRef, initialRotation, isRotatable]
 	);
 export const useHandleMouse = ({
+								   addGuides,
 	currentRotation,
 	currentSize,
 	initialPosition,
@@ -202,7 +203,9 @@ export const useHandleMouse = ({
 	guideRequests,
 	guides,
 	hideGuides,
-	showGuides
+								   removeGuides,
+	showGuides,
+	updateGuide
 }) =>
 	React.useCallback(
 		({x, y}) => {
@@ -221,7 +224,7 @@ export const useHandleMouse = ({
 								angle: degToRad(currentRotation.z)
 							})
 						},
-						{guideRequests, guides, hideGuides, showGuides},
+						{guideRequests, guides, hideGuides, showGuides, updateGuide, addGuides, removeGuides},
 						model
 					) as Mops.SnapHandler)
 				}),

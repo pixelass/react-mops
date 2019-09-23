@@ -12,7 +12,9 @@ const {Provider, Consumer} = React.createContext<Mops.GuidesContext>({
 	// tslint:disable-next-line:no-empty
 	removeGuides: () => {},
 	// tslint:disable-next-line:no-empty
-	showGuides: () => {}
+	showGuides: () => {},
+	// tslint:disable-next-line:no-empty
+	updateGuide: () => {}
 });
 
 export {Consumer as GuidesConsumer};
@@ -77,6 +79,17 @@ export const GuidesProvider: React.FunctionComponent<{
 			)
 		);
 	};
+
+	const updateGuide = (partialItem) => {
+		setGuides(state =>
+			update(
+				state,
+				{[state.findIndex(({uuid}) => uuid === partialItem.uuid)]: {
+					$merge: partialItem
+					}}
+			)
+		);
+	};
 	React.useEffect(() => {
 		if (guideRequests) {
 			const guideModels = guideRequests.map(({uuid, x, y}) => {
@@ -107,7 +120,7 @@ export const GuidesProvider: React.FunctionComponent<{
 		}
 	}, [guideRequests, containerSize]);
 	return (
-		<Provider value={{guideRequests, guides, addGuides, removeGuides, showGuides, hideGuides}}>
+		<Provider value={{guideRequests, guides, addGuides, removeGuides, showGuides, hideGuides, updateGuide}}>
 			{children}
 		</Provider>
 	);

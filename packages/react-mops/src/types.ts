@@ -252,5 +252,10 @@ export namespace Mops {
 		removeGuides: (uuids?: string[]) => void;
 		showGuides: (guides?: string[]) => void;
 		hideGuides: (guides?: string[]) => void;
+		updateGuide: (guideModel: Partial<Guide>) => void;
+	}
+
+	export interface Sibling extends Partial<BoundingBox> {
+		uuid: string;
 	}
 }

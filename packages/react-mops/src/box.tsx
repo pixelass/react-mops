@@ -52,6 +52,9 @@ export const Box: React.RefForwardingComponent<
 			scale,
 			showGuides,
 			hideGuides,
+			updateGuide,
+			addGuides,
+			removeGuides,
 			guides,
 			guideRequests,
 			shouldSnap,
@@ -140,14 +143,17 @@ export const Box: React.RefForwardingComponent<
 			withHandle
 		});
 		const handleMouse = useHandleMouse({
+			addGuides,
 			currentRotation,
 			currentSize,
 			guideRequests,
 			guides,
 			hideGuides,
 			initialPosition,
+			removeGuides,
 			shouldSnap,
-			showGuides
+			showGuides,
+			updateGuide
 		});
 		const handleMouseEvent = useHandleMouseEvent({
 			additionalAngle,
