@@ -6,9 +6,9 @@ export const GlobalStyle = createGlobalStyle`
 		margin: 0;
 		font-family: sans-serif;
 		background-image: 
-			linear-gradient(-45deg, hsla(200, 100%, 30%, 0.5), hsla(50, 100%, 70%, 0.5)),
-			linear-gradient(45deg, hsla(0, 100%, 30%, 0.5), hsla(150, 100%, 70%, 0.5)),
-			linear-gradient(90deg, hsla(100, 100%, 30%), hsla(250, 100%, 70%));
+			linear-gradient(-65deg, hsla(200, 100%, 70%, 0.75), hsla(50, 100%, 90%, 0.25)),
+			linear-gradient(65deg, hsla(0, 100%, 70%, 0.75), hsla(150, 100%, 90%, 0.25)),
+			linear-gradient(45deg, hsla(100, 100%, 50%), hsla(250, 100%, 50%));
 		background-attachment: fixed;
 		background-size: 100vw 100vh;
 		color:  hsla(0, 0%, 0%, 0.8);

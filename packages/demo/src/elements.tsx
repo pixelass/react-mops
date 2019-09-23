@@ -113,18 +113,24 @@ export const StyledImage = styled.img`
 	width: 100%;
 `;
 export const Button = styled.button<{ isActive?: boolean }>`
-	padding: 0.5rem 1.5rem;
+	position: relative;
+	padding: 0.25rem 1rem;
 	border: 0;
 	border-radius: 3px;
 	margin: 0.25rem;
 	color: black;
 	font-size: 1em;
+	font-weight: lighter;
 	${({isActive}) => css`
-		background: ${isActive ? "#aaf" : "#fff"};
+		background: ${isActive ? "hsl(220, 80%, 40%)" : "#fff"};
+		color:  ${isActive ? "#fff" : "#000"};
 		&:hover {
-			background: ${isActive ? "#88d" : "#ddd"};
+			background: ${isActive ? "hsl(220, 80%, 20%)" : "#ddd"};
 		}
 	`}
+	&:focus {
+		z-index: 1;
+	}
 `;
 
 export const ButtonWrapper = styled.div`

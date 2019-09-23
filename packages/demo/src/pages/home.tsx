@@ -65,7 +65,7 @@ export function Home() {
 					<Headline>Orientation</Headline>
 					<ul>
 						<li>
-							Press <code>Cmd</code> to enable rotation.
+							Press <code>Cmd / Ctrl)</code> to enable rotation. (OS X / Windows, Linux)
 						</li>
 						<li>Hold and drag a handle.</li>
 						<li>
