@@ -4,7 +4,7 @@ export const containerSize = {
 	height: 900,
 	width: 1200
 };
-export const gridSize = {x: 100, y: 100};
+export const gridSize = {x: 25, y: 25};
 export const fixedGuides = [
 	{uuid: uuidV4(), x: containerSize.width / 4},
 	{uuid: uuidV4(), x: (containerSize.width / 4) * 3},

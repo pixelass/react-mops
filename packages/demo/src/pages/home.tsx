@@ -1,15 +1,17 @@
+import update from "immutability-helper";
 import React from "react";
 import {
 	GuidedBox as Box,
 	Guides,
 	GuidesProvider,
 	Mops,
-	to360,
 	toBounds,
 	toGrid,
-	toGuides
+	toGuides,
+	toSiblings
 } from "react-mops";
 import {ThemeProvider} from "styled-components";
+import {v4 as uuidV4} from "uuid";
 import {containerSize, fixedGuides, gridSize} from "../constants";
 import {
 	Button,
@@ -20,11 +22,16 @@ import {
 	Headline,
 	Inner,
 	InvisibleMarker,
-	StyledBox, SubHeadline, Title,
+	StyledBox,
+	SubHeadline,
+	Title,
 	Wrapper
 } from "../elements";
 
+
+
 export function Home() {
+	const [items, setItems] = React.useState<Mops.Sibling[]>([]);
 	const [isDraggable, setDraggable] = React.useState(true);
 	const [isResizable, setResizable] = React.useState(false);
 	const [isRotatable, setRotatable] = React.useState(false);
@@ -34,6 +41,41 @@ export function Home() {
 	const [hasGrid, setGrid] = React.useState(false);
 	const [hasBounds, setBounds] = React.useState(true);
 	const [hasGuides, setGuides] = React.useState(false);
+	const [hasSiblings, setSiblings] = React.useState(true);
+
+	const updateItem = (item: Mops.Sibling) =>
+		setItems(state => {
+			const index = state.findIndex(({uuid}) => uuid === item.uuid);
+			const $spec = {
+				[index]: {
+					$merge: item
+				}
+			};
+			return update(state, $spec);
+		});
+
+	const addItem = () => {
+		setItems(state => [
+			...state,
+			{
+				position: {
+					x: 50,
+					y: 50
+				},
+				rotation: {
+					x: 0,
+					y: 0,
+					z: 0
+				},
+				size: {
+					height: 100,
+					width: 100
+				},
+				uuid: uuidV4()
+			}
+		]);
+	};
+
 	const shouldSnap: Mops.SnapHandler[] = React.useMemo(
 		() =>
 			[
@@ -54,9 +96,13 @@ export function Home() {
 							top: 0
 					  })
 					: undefined
-			].filter(Boolean),
+			],
 		[hasBounds, hasGrid, hasGuides, isDraggable, isResizable, isRotatable]
 	);
+	React.useEffect(() => {
+		addItem();
+	}, []);
+
 	return (
 		<ThemeProvider theme={{}}>
 			<React.Fragment>
@@ -65,7 +111,8 @@ export function Home() {
 					<Headline>Orientation</Headline>
 					<ul>
 						<li>
-							Press <code>Cmd / Ctrl)</code> to enable rotation. (OS X / Windows, Linux)
+							Press <code>Cmd / Ctrl)</code> to enable rotation. (OS X / Windows,
+							Linux)
 						</li>
 						<li>Hold and drag a handle.</li>
 						<li>
@@ -86,7 +133,7 @@ export function Home() {
 							Press <code>Shift</code> to retain the aspect-ratio.
 						</li>
 					</ul>
-					<hr/>
+					<hr />
 					<SubHeadline>Snapping (onDrag)</SubHeadline>
 					<ButtonWrapper>
 						<Button
@@ -109,6 +156,13 @@ export function Home() {
 							}}
 							isActive={hasGuides}>
 							Guides
+						</Button>
+						<Button
+							onClick={() => {
+								setSiblings(state => !state);
+							}}
+							isActive={hasSiblings}>
+							Siblings
 						</Button>
 					</ButtonWrapper>
 					<SubHeadline>Modifiers</SubHeadline>
@@ -159,6 +213,8 @@ export function Home() {
 							Handle Markers
 						</Button>
 					</ButtonWrapper>
+					<hr />
+					<Button onClick={addItem}>Add Box</Button>
 				</Wrapper>
 
 				<Examples>
@@ -170,38 +226,38 @@ export function Home() {
 								withGrid={hasGrid ? gridSize : undefined}
 								hasBounds={hasBounds}>
 								<Guides />
-								{Array(3)
-									.fill(Boolean)
-									.map((x, i) => (
-										<Box
-											key={i}
-											as={StyledBox}
-											drawBoundingBox={showBoundingBox}
-											drawBox={showBox}
-											isDraggable={isDraggable}
-											isResizable={isResizable}
-											isRotatable={isRotatable}
-											minHeight={100}
-											minWidth={100}
-											marker={showMarkers ? undefined : InvisibleMarker}
-											fullHandles={!showMarkers}
-											size={{
-												height: 100 + 41 * (i % 4),
-												width: 100 + 36 * (i % 5)
-											}}
-											position={{
-												x: 120 + 65 * 3 * (i % 6),
-												y: 120 + 32 * 3 * Math.floor(i / 4)
-											}}
-											rotation={{
-												x: 0,
-												y: 0,
-												z: to360(((i % 12) + 1) * 68)
-											}}
-											shouldSnap={shouldSnap}>
-											<Inner />
-										</Box>
-									))}
+								{items.map(({uuid, size, position, rotation}, i) => (
+									<Box
+										key={uuid}
+										as={StyledBox}
+										drawBoundingBox={showBoundingBox}
+										drawBox={showBox}
+										isDraggable={isDraggable}
+										isResizable={isResizable}
+										isRotatable={isRotatable}
+										onDragEnd={b => {
+											updateItem({uuid, ...b});
+										}}
+										onResizeEnd={b => {
+											updateItem({uuid, ...b});
+										}}
+										onRotateEnd={b => {
+											updateItem({uuid, ...b});
+										}}
+										minHeight={100}
+										minWidth={100}
+										marker={showMarkers ? undefined : InvisibleMarker}
+										fullHandles={!showMarkers}
+										size={size}
+										position={position}
+										rotation={rotation}
+										shouldSnap={[
+											...shouldSnap,
+											hasSiblings && toSiblings(items.filter(item => item.uuid !== uuid))
+										].filter(Boolean)}>
+										<Inner />
+									</Box>
+								))}
 							</Container>
 						</Example>
 					</GuidesProvider>
