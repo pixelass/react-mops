@@ -118,7 +118,7 @@ export const getRotation = (
 		})
 	};
 };
-export const getBoundingBox = ({height, width, angle}) => ({
+export const getBoundingBox = ({height, width, angle} : {height: number; width: number; angle: number;}) => ({
 	height: Math.abs(Math.sin(angle)) * width + Math.abs(Math.cos(angle)) * height,
 	width: Math.abs(Math.sin(angle)) * height + Math.abs(Math.cos(angle)) * width
 });

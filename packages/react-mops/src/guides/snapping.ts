@@ -1,6 +1,6 @@
 import {v4 as uuidV4} from "uuid";
 import {Mops} from "../types";
-import {getBoundingBox, inRange} from "../utils";
+import {degToRad, getBoundingBox, inRange} from "../utils";
 
 export const toBounds = ({top, right, bottom, left}) => (
 	{position, size},
@@ -87,14 +87,14 @@ const SIBLING_X = uuidV4();
 const SIBLING_Y = uuidV4();
 
 export const toSiblings = (siblings: Mops.Sibling[]): Mops.SnapHandler => (
-	{position, size},
+	{position, size, rotation},
 	{addGuides, removeGuides, updateGuide, guides},
 	model = position
 ) => {
 	const withBoundingBox = siblings.map(sibling => ({
 		...sibling,
 		boundingBox: getBoundingBox({
-			angle: sibling.rotation.z,
+			angle: degToRad(sibling.rotation.z),
 			height: sibling.size.height,
 			width: sibling.size.width
 		})
@@ -196,7 +196,7 @@ export const toSiblings = (siblings: Mops.Sibling[]): Mops.SnapHandler => (
 		const dir = snaplings.y.position.x > model.x ? -1 : 1;
 		const [x1, x2] = [
 			snaplings.y.position.x - (snaplings.y.boundingBox.width / 2) * dir,
-			(hasSnap.x ? snaplings.x.position.x : model.x) + (size.width / 2) * dir
+			model.x + (size.width / 2) * dir
 		];
 		const guide = {
 			uuid: SIBLING_Y,
