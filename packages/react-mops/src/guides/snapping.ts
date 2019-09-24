@@ -196,7 +196,7 @@ export const toSiblings = (siblings: Mops.Sibling[]): Mops.SnapHandler => (
 		const dir = snaplings.y.position.x > model.x ? -1 : 1;
 		const [x1, x2] = [
 			snaplings.y.position.x - (snaplings.y.boundingBox.width / 2) * dir,
-			model.x + (size.width / 2) * dir
+			(hasSnap.x ? snaplings.x.position.x : model.x) + (size.width / 2) * dir
 		];
 		const guide = {
 			uuid: SIBLING_Y,
