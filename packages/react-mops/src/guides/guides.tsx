@@ -80,14 +80,13 @@ export const GuidesProvider: React.FunctionComponent<{
 		);
 	};
 
-	const updateGuide = (partialItem) => {
+	const updateGuide = partialItem => {
 		setGuides(state =>
-			update(
-				state,
-				{[state.findIndex(({uuid}) => uuid === partialItem.uuid)]: {
+			update(state, {
+				[state.findIndex(({uuid}) => uuid === partialItem.uuid)]: {
 					$merge: partialItem
-					}}
-			)
+				}
+			})
 		);
 	};
 	React.useEffect(() => {
@@ -120,7 +119,16 @@ export const GuidesProvider: React.FunctionComponent<{
 		}
 	}, [guideRequests, containerSize]);
 	return (
-		<Provider value={{guideRequests, guides, addGuides, removeGuides, showGuides, hideGuides, updateGuide}}>
+		<Provider
+			value={{
+				guideRequests,
+				guides,
+				addGuides,
+				removeGuides,
+				showGuides,
+				hideGuides,
+				updateGuide
+			}}>
 			{children}
 		</Provider>
 	);
