@@ -28,7 +28,7 @@ to an Element as seen in design software like Photoshop, Sketch any many others.
 
 **(implemented / planned)**
 
-* [ ] `<Guides/>` component
+* [x] `<Guides/>` component
 * [x] Resize
   * [x] Alt key: resize left/right, top/bottom or all directions for corners
   * [x] Shift key: retain aspect-ratio
@@ -115,19 +115,20 @@ https://codesandbox.io/s/react-mops-4cwhx
 
 **Resizable**
 
-![resizable](https://dekk-app.github.io/react-mops/mops_resizable.gif)
+![resizable](https://dekk-app.github.io/react-mops/mops_resizable_01.gif)
 
 **Rotatable**
 
-![rotatable](https://dekk-app.github.io/react-mops/mops_rotatable.gif)
+![rotatable](https://dekk-app.github.io/react-mops/mops_rotatable_01.gif)
 
 **Draggable**
 
-![draggable](https://dekk-app.github.io/react-mops/mops_draggable.gif)
+![draggable](https://dekk-app.github.io/react-mops/mops_draggable_01.gif)
+![draggable](https://dekk-app.github.io/react-mops/mops_draggable_02.gif)
 
 **Combined**
 
-![combined](https://dekk-app.github.io/react-mops/mops_combined.gif)
+![combined](https://dekk-app.github.io/react-mops/mops_combined_01.gif)
 
 
 Pug icons [created by freepik - www.freepik.com](https://www.freepik.com/free-photos-vectors/design);
