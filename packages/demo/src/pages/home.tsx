@@ -20,6 +20,7 @@ import {
 	Example,
 	Examples,
 	Headline,
+	Icon,
 	Inner,
 	InvisibleMarker,
 	StyledBox,
@@ -29,12 +30,11 @@ import {
 } from "../elements";
 
 
-
 export function Home() {
 	const [items, setItems] = React.useState<Mops.Sibling[]>([]);
 	const [isDraggable, setDraggable] = React.useState(true);
-	const [isResizable, setResizable] = React.useState(false);
-	const [isRotatable, setRotatable] = React.useState(false);
+	const [isResizable, setResizable] = React.useState(true);
+	const [isRotatable, setRotatable] = React.useState(true);
 	const [showMarkers, setMarkers] = React.useState(true);
 	const [showBox, setBox] = React.useState(false);
 	const [showBoundingBox, setBoundingBox] = React.useState(false);
@@ -255,7 +255,9 @@ export function Home() {
 											...shouldSnap,
 											hasSiblings && toSiblings(items.filter(item => item.uuid !== uuid))
 										].filter(Boolean)}>
-										<Inner />
+										<Inner >
+											<Icon icon="M15,20H9V12H4.16L12,4.16L19.84,12H15V20Z"/>
+										</Inner>
 									</Box>
 								))}
 							</Container>

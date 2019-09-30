@@ -1,3 +1,4 @@
+import React from "react";
 import styled, {css} from "styled-components";
 import {containerSize} from "./constants";
 
@@ -80,11 +81,15 @@ export const Container = styled.div<{ withGrid?: { x: number; y: number }; hasBo
 		`}
 `;
 export const Inner = styled.div`
-	background: hsl(340, 100%, 60%);
+	background-image: linear-gradient(180deg, hsl(340, 100%, 40%), hsl(340, 100%, 30%));
+	color: hsl(340, 100%, 80%);
+	display: flex;
+	align-items: center;
+	align-content: center;
+	justify-content: center;
 	height: 100%;
 	width: 100%;
 	border-radius: 2px;
-	// border: 1px solid hsl(340, 100%, 30%);
 `;
 export const StyledMarker = styled.span`
 	position: absolute;
@@ -151,3 +156,21 @@ export const ButtonWrapper = styled.div`
 		}
 	}
 `;
+
+export const Svg = styled.svg.attrs({
+	viewBox: "0 0 24 24"
+})`
+	height: 100px;
+	width: 100px;
+	max-width: 100%;
+	max-height: 100%;
+`;
+
+export const Path = styled.path`
+	fill: currentColor;
+`;
+
+export const Icon = ({icon, ...props}) => <Svg>
+	<Path d={icon}/>
+</Svg>;
+
