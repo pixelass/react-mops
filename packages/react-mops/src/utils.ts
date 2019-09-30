@@ -37,6 +37,20 @@ export const coordinatesToDeg = (
 	return to360((Math.atan2(y, x) * 180) / Math.PI);
 };
 
+export const normalize = (n) => {
+	const rounded = Math.round(n * 10000) / 10000;
+	if (rounded === 0 ||rounded === -0) {
+		return 0;
+	}
+	return rounded;
+};
+
+export const polarToCartesian = (deg: number, radius: number = 1): Mops.PositionModel => {
+	const y = sin(deg) * radius;
+	const x = cos(deg) * radius;
+	return {x, y};
+};
+
 /**
  * Convert degrees to radians
  * @param {number} deg
@@ -83,12 +97,10 @@ export const atan2 = (opposite: number, adjacent: number): number =>
  * @param {number} dY
  * @param {number} deg
  */
-export const withRotation = (dX: number, dY: number, deg: number) => {
+export const withRotation = (dX: number, dY: number, deg: number): Mops.PositionModel => {
 	const hypotenuse = getHypotenuse(dX, dY);
 	const beta = atan2(dY, dX);
-	const y = hypotenuse * sin(beta - deg);
-	const x = hypotenuse * cos(beta - deg);
-	return {x, y};
+	return polarToCartesian(beta - deg, hypotenuse);
 };
 
 /**
@@ -118,7 +130,8 @@ export const getRotation = (
 		})
 	};
 };
-export const getBoundingBox = ({
+
+export const getBounds = ({
 	height,
 	width,
 	angle
@@ -126,9 +139,29 @@ export const getBoundingBox = ({
 	height: number;
 	width: number;
 	angle: number;
-}) => ({
-	height: Math.abs(Math.sin(angle)) * width + Math.abs(Math.cos(angle)) * height,
-	width: Math.abs(Math.sin(angle)) * height + Math.abs(Math.cos(angle)) * width
-});
+}) => {
+	const rad = degToRad(angle);
+	const deg = radToDeg(
+		(rad > Math.PI * 0.5 && rad < Math.PI) || (rad > Math.PI * 1.5 && rad < Math.PI * 2)
+			? Math.PI - rad
+			: rad
+	);
+	return {
+		height: sin(deg) * width + cos(deg) * height,
+		width: sin(deg) * height + cos(deg) * width
+	};
+};
+
+export const getBoundingBox = (m: {height: number; width: number; angle: number}) => {
+	const {height, width} = getBounds(m);
+	return {
+		height: Math.abs(height),
+		width: Math.abs(width)
+	};
+};
 
 export const inRange = (value: number, min: number, max: number) => value >= min && value <= max;
+
+const fallback = (...n: number[]) => n[0];
+export const chooseFn = (a: number, b: number = 0): ((...values: number[]) => number) =>
+	a > b ? Math.min : b > a ? Math.max : fallback;

@@ -94,7 +94,7 @@ export const toSiblings = (siblings: Mops.Sibling[]): Mops.SnapHandler => (
 	const withBoundingBox = siblings.map(sibling => ({
 		...sibling,
 		boundingBox: getBoundingBox({
-			angle: degToRad(sibling.rotation.z),
+			angle: sibling.rotation.z,
 			height: sibling.size.height,
 			width: sibling.size.width
 		})

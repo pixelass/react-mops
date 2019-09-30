@@ -7,14 +7,12 @@ import {coordinatesToDeg, degToRad, getBoundingBox, to360, withRotation} from ".
  * @param {Mops.MouseHandler} onMouseUp
  * @param {Mops.MouseHandler} onMouseMove
  * @param {number} scale
- * @param {React.RefObject<HTMLElement>} [contentRef]
  * @param {Mops.RotationModel} [rotation]
  */
 export const useMouseMove = (
 	onMouseUp: Mops.MouseHandler,
 	onMouseMove: Mops.MouseHandler,
 	scale: number,
-	contentRef?: React.RefObject<HTMLElement>,
 	rotation?: Mops.RotationModel
 ) => {
 	const [isDown, setDown] = React.useState(false);
@@ -23,39 +21,38 @@ export const useMouseMove = (
 		y: 0
 	});
 
+	const getRotatedPosition = React.useCallback(
+		(event: MouseEvent): Mops.PositionModel => {
+			const newPosition = {
+				x: (event.clientX - initialPosition.x) / scale,
+				y: (event.clientY - initialPosition.y) / scale
+			};
+			return rotation ? withRotation(newPosition.x, newPosition.y, rotation.z) : newPosition;
+		},
+		[initialPosition, scale, rotation]
+	);
+
 	const handleMouseUp = React.useCallback(
 		(event: MouseEvent) => {
 			if (isDown) {
 				event.preventDefault();
-				const newPosition = {
-					x: (event.clientX - initialPosition.x) / scale,
-					y: (event.clientY - initialPosition.y) / scale
-				};
-				const rotatedPosition = rotation
-					? withRotation(newPosition.x, newPosition.y, rotation.z)
-					: newPosition;
+				const rotatedPosition = getRotatedPosition(event);
 				setDown(false);
 				onMouseUp(rotatedPosition, event.altKey, event.shiftKey, event);
 			}
 		},
-		[setDown, onMouseUp]
+		[setDown, onMouseUp, getRotatedPosition]
 	);
 
 	const handleMouseMove = React.useCallback(
 		(event: MouseEvent) => {
 			if (isDown) {
 				event.preventDefault();
-				const newPosition = {
-					x: (event.clientX - initialPosition.x) / scale,
-					y: (event.clientY - initialPosition.y) / scale
-				};
-				const rotatedPosition = rotation
-					? withRotation(newPosition.x, newPosition.y, rotation.z)
-					: newPosition;
+				const rotatedPosition = getRotatedPosition(event);
 				onMouseMove(rotatedPosition, event.altKey, event.shiftKey, event);
 			}
 		},
-		[onMouseMove]
+		[onMouseMove, getRotatedPosition]
 	);
 
 	React.useEffect(() => {
@@ -82,7 +79,7 @@ export const useMouseMove = (
 				setInitialPosition({x: event.clientX, y: event.clientY});
 			}
 		},
-		[contentRef, setInitialPosition, setDown]
+		[setInitialPosition, setDown]
 	);
 
 	return [isDown, handleDown] as [boolean, (e: React.MouseEvent<HTMLElement>) => void];
@@ -221,7 +218,7 @@ export const useHandleMouse = ({
 							rotation: currentRotation,
 							size: getBoundingBox({
 								...currentSize,
-								angle: degToRad(currentRotation.z)
+								angle: currentRotation.z
 							})
 						},
 						{

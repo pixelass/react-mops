@@ -8,7 +8,10 @@ export const useWithHandle = (
 		setInitialSize,
 		setPosition,
 		setSize,
+		currentPosition,
 		currentRotation,
+		initialPosition,
+		initialSize,
 		scale,
 		contentRef,
 		isResizable,
@@ -20,26 +23,17 @@ export const useWithHandle = (
 	React.useCallback(
 		({handleSize, handlePosition}) => {
 			return useHandle({
-				contentRef: contentRef as React.RefObject<HTMLElement>,
 				handlePosition: ({x, y}, altKey, shiftKey) => state => {
 					if (!isResizable) {
 						return state;
 					}
-					// const sizeState = handleSize({x, y}, altKey, shiftKey);
-					// const nextSize = typeof sizeState === "function" ? sizeState(state) : sizeState;
-					// const finalSize = {
-					// 	height: Math.max(minHeight, nextSize.height),
-					// 	width: Math.max(minWidth, nextSize.width)
-					// }
-					// const stopY = finalSize.height === minHeight;
-					// const stopX = finalSize.width === minWidth;
 					const positionState = handlePosition({x, y}, altKey, shiftKey);
-					const nextPosition =
+					const {limit, ...nextPosition} =
 						typeof positionState === "function" ? positionState(state) : positionState;
 					return nextPosition;
 					// return {
-					// 	x: stopY ? state.x : nextPosition.x,
-					// 	y: stopX ? state.y : nextPosition.y
+					// 	x: limit.x(nextPosition.x),
+					// 	y: limit.y(nextPosition.y)
 					// };
 				},
 				handleSize: ({x, y}, altKey, shiftKey) => state => {
@@ -48,10 +42,15 @@ export const useWithHandle = (
 					}
 					const sizeState = handleSize({x, y}, altKey, shiftKey);
 					const nextSize = typeof sizeState === "function" ? sizeState(state) : sizeState;
-					return {
-						height: Math.max(minHeight, nextSize.height),
-						width: Math.max(minWidth, nextSize.width)
+					const absSize = {
+						height: Math.abs(nextSize.height),
+						width: Math.abs(nextSize.width)
 					};
+					return absSize;
+					// return {
+					// 	height: Math.max(minHeight, absSize.height),
+					// 	width: Math.max(minWidth, absSize.width)
+					// };
 				},
 				rotation: currentRotation,
 				scale,
@@ -66,20 +65,25 @@ export const useWithHandle = (
 			setInitialSize,
 			setPosition,
 			setSize,
+			currentPosition,
 			currentRotation,
+			initialPosition,
+			initialSize,
 			scale,
 			contentRef,
 			isResizable,
+			minHeight,
+			minWidth,
 			...deps
 		]
 	);
 export const useWithCornerHandle = ({withHandle, currentRotation, initialPosition, initialSize}) =>
 	React.useCallback(
-		({getPositionDiff, getSizeDiff}) =>
+		({getPositionDiff, getSizeDiff, limit}) =>
 			withHandle({
 				handlePosition: ({x, y}, altKey, shiftKey) => state => {
 					if (altKey) {
-						return state;
+						return {limit, ...state};
 					}
 					const dX = getPositionDiff(x);
 					const e = withRotation(x, 0, currentRotation.z);
@@ -92,6 +96,7 @@ export const useWithCornerHandle = ({withHandle, currentRotation, initialPositio
 						currentRotation.z
 					);
 					return {
+						limit,
 						x: initialPosition.x - d.x / 2 + e.x / 2,
 						y: initialPosition.y + d.y / 2 - e.y / 2
 					};
@@ -116,6 +121,11 @@ export const useHandlesDown = ({
 	currentRotation,
 	initialPosition,
 	initialSize,
+	// limitLeft,
+	// limitRight,
+	// limitTop,
+	// limitTopLeft,
+	// limitBottom,
 	withCornerHandle,
 	withHandle
 }) => {
@@ -123,6 +133,7 @@ export const useHandlesDown = ({
 		handlePosition: ({x, y}, altKey) => {
 			const d = withRotation(0, y, currentRotation.z);
 			return {
+				// limit: limitTop,
 				x: initialPosition.x - (altKey ? 0 : d.x / 2),
 				y: initialPosition.y + (altKey ? 0 : d.y / 2)
 			};
@@ -139,6 +150,7 @@ export const useHandlesDown = ({
 		handlePosition: ({x, y}, altKey) => {
 			const d = withRotation(x, 0, currentRotation.z);
 			return {
+				// limit: limitRight,
 				x: initialPosition.x + (altKey ? 0 : d.x / 2),
 				y: initialPosition.y - (altKey ? 0 : d.y / 2)
 			};
@@ -155,6 +167,7 @@ export const useHandlesDown = ({
 		handlePosition: ({x, y}, altKey) => {
 			const d = withRotation(0, y, currentRotation.z);
 			return {
+				// limit: limitBottom,
 				x: initialPosition.x - (altKey ? 0 : d.x / 2),
 				y: initialPosition.y + (altKey ? 0 : d.y / 2)
 			};
@@ -171,6 +184,7 @@ export const useHandlesDown = ({
 		handlePosition: ({x, y}, altKey) => {
 			const d = withRotation(x, 0, currentRotation.z);
 			return {
+				// limit: limitLeft,
 				x: initialPosition.x + (altKey ? 0 : d.x / 2),
 				y: initialPosition.y - (altKey ? 0 : d.y / 2)
 			};
@@ -186,21 +200,34 @@ export const useHandlesDown = ({
 	const [isTopLeftDown, setTopLeftDown] = withCornerHandle({
 		getPositionDiff: x => -x,
 		getSizeDiff: ({x, y}) => ({x: -x, y: -y})
+		// limit: limitTopLeft
 	});
 
 	const [isTopRightDown, setTopRightDown] = withCornerHandle({
 		getPositionDiff: x => x,
 		getSizeDiff: ({x, y}) => ({x, y: -y})
+		// limit: {
+		// 	x: limitLeft.x,
+		// 	y: limitTop.y
+		// }
 	});
 
 	const [isBottomLeftDown, setBottomLeftDown] = withCornerHandle({
 		getPositionDiff: x => x,
 		getSizeDiff: ({x, y}) => ({x: -x, y})
+		// limit: {
+		// 	x: limitLeft.x,
+		// 	y: limitBottom.y
+		// }
 	});
 
 	const [isBottomRightDown, setBottomRightDown] = withCornerHandle({
 		getPositionDiff: x => -x,
 		getSizeDiff: ({x, y}) => ({x, y})
+		// limit: {
+		// 	x: limitRight.x,
+		// 	y: limitBottom.y
+		// }
 	});
 
 	return {

@@ -18,7 +18,7 @@ import {
 	useWithHandle
 } from "./hooks";
 import {Mops} from "./types";
-import {degToRad, getBoundingBox} from "./utils";
+import {getBoundingBox} from "./utils";
 
 export const Box: React.RefForwardingComponent<
 	HTMLElement,
@@ -102,7 +102,10 @@ export const Box: React.RefForwardingComponent<
 		});
 		const withHandle = useWithHandle({
 			contentRef,
+			currentPosition,
 			currentRotation,
+			initialPosition,
+			initialSize,
 			isResizable,
 			minHeight,
 			minWidth,
@@ -112,12 +115,41 @@ export const Box: React.RefForwardingComponent<
 			setPosition,
 			setSize
 		});
+
+		// const getLimit = React.useCallback(
+		// 	(radius, angle) => {
+		// 		const {x, y} = polarToCartesian(angle + initialRotation.z);
+		// 		return {
+		// 			x: (n: number) => chooseFn(x)(initialPosition.x + x * radius, n),
+		// 			y: (n: number) => chooseFn(y)( initialPosition.y + y * radius, n)
+		// 		};
+		// 	},
+		// 	[initialPosition, initialRotation]
+		// );
+		// const diff = React.useMemo(
+		// 	() => ({
+		// 		x: (initialSize.width - minWidth) / 2,
+		// 		y: (initialSize.height - minHeight) / 2
+		// 	}),
+		// 	[initialSize, minHeight, minWidth]
+		// );
+		// const limitLeft = React.useMemo(() => getLimit(diff.x, 0), [diff, getLimit]);
+		// const limitTop = React.useMemo(() => getLimit(diff.y, 90), [diff, getLimit]);
+		// const limitRight = React.useMemo(() => getLimit(diff.x, 180), [diff, getLimit]);
+		// const limitBottom = React.useMemo(() => getLimit(diff.y, 270), [diff, getLimit]);
+		// const limitTopLeft = React.useMemo(() => {
+		// 	const distance = getHypotenuse(diff.y, diff.x);
+		// 	const angle = atan2(diff.y, diff.x);
+		// 	return getLimit(distance, angle);
+		// }, [diff, getLimit]);
+
 		const withCornerHandle = useWithCornerHandle({
 			currentRotation,
 			initialPosition,
 			initialSize,
 			withHandle
 		});
+
 		const {
 			isBottomDown,
 			isBottomLeftDown,
@@ -139,6 +171,11 @@ export const Box: React.RefForwardingComponent<
 			currentRotation,
 			initialPosition,
 			initialSize,
+			// limitBottom,
+			// limitLeft,
+			// limitRight,
+			// limitTop,
+			// limitTopLeft,
 			withCornerHandle,
 			withHandle
 		});
@@ -190,7 +227,7 @@ export const Box: React.RefForwardingComponent<
 		const boxStyle = {
 			...getBoundingBox({
 				...currentSize,
-				angle: degToRad(currentRotation.z)
+				angle: currentRotation.z
 			})
 		};
 		const contentStyle = {

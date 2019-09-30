@@ -13,7 +13,6 @@ import {useMouseMove} from "./mouse-event-hooks";
  * @param options.handlePosition
  * @param options.scale
  * @param options.rotation
- * @param options.contentRef
  */
 export const useHandle = ({
 	setSize,
@@ -23,8 +22,7 @@ export const useHandle = ({
 	handleSize,
 	handlePosition,
 	scale,
-	rotation,
-	contentRef
+	rotation
 }: Mops.UseHandleProps) => {
 	const [isDown, setDown] = useMouseMove(
 		(position: Mops.PositionModel, altKey: boolean, shiftKey: boolean) => {
@@ -42,7 +40,6 @@ export const useHandle = ({
 			setPosition(nextPosition);
 		},
 		scale,
-		contentRef,
 		rotation
 	);
 	return [isDown, setDown] as [boolean, (e: React.MouseEvent<HTMLElement>) => void];
