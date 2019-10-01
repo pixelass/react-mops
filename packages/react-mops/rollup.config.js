@@ -34,7 +34,7 @@ module.exports = () => {
 					extract: true,
 					modules: {
 						generateScopedName:
-							process.env === "production" ? "[hash:base64:5]" : "[local]"
+							process.env.NODE_ENV === "production" ? "[hash:base64:5]" : "[local]"
 					}
 				}),
 				...getPlugins(tsconfig)
