@@ -186,7 +186,7 @@
 }
 
 .seRotate {
-	--x1: url("./cursors/images/s-rotate.png");
-	--x2: url("./cursors/images/s-rotate@2x.png");
+	--x1: url("./cursors/images/se-rotate.png");
+	--x2: url("./cursors/images/se-rotate@2x.png");
 }
 
