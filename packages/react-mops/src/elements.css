@@ -41,6 +41,11 @@
 	) 9 9, default;
 }
 
+.full {
+	height: 100%;
+	width: 100%;
+}
+
 .e {
 	right: -10px;
 	top: 50%;
@@ -95,11 +100,6 @@
 	top: 50%;
 	transform: translateY(-50%);
 	width: 20px;
-}
-
-.full {
-	height: 100%;
-	width: 100%;
 }
 
 .handleMarker {
