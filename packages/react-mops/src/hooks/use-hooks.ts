@@ -65,16 +65,16 @@ export const useMeta = () => {
 	}, [handleFocus]);
 
 	React.useEffect(() => {
-		window.addEventListener("keydown", handleKeyDown);
+		document.addEventListener("keydown", handleKeyDown);
 		return () => {
-			window.removeEventListener("keydown", handleKeyDown);
+			document.removeEventListener("keydown", handleKeyDown);
 		};
 	}, [handleKeyDown]);
 
 	React.useEffect(() => {
-		window.addEventListener("keyup", handleKeyUp);
+		document.addEventListener("keyup", handleKeyUp);
 		return () => {
-			window.removeEventListener("keyup", handleKeyUp);
+			document.removeEventListener("keyup", handleKeyUp);
 		};
 	}, [handleKeyUp]);
 	return metaKey;

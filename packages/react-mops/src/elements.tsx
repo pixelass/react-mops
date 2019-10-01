@@ -48,8 +48,12 @@ const HandleBase: React.RefForwardingComponent<
 				setDown(false);
 			};
 			window.addEventListener("mouseup", handleMouseUp);
+			window.addEventListener("mouseleave", handleMouseUp);
+			window.addEventListener("blur", handleMouseUp);
 			return () => {
 				window.removeEventListener("mouseup", handleMouseUp);
+				window.removeEventListener("mouseleave", handleMouseUp);
+				window.removeEventListener("blur", handleMouseUp);
 			};
 		}, [setDown]);
 		const handleClick = React.useCallback(

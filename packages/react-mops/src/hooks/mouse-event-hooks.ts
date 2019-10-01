@@ -57,17 +57,17 @@ export const useMouseMove = (
 
 	React.useEffect(() => {
 		document.addEventListener("mouseleave", handleMouseUp);
-		window.addEventListener("mouseup", handleMouseUp);
+		document.addEventListener("mouseup", handleMouseUp);
 		return () => {
 			document.removeEventListener("mouseleave", handleMouseUp);
-			window.removeEventListener("mouseup", handleMouseUp);
+			document.removeEventListener("mouseup", handleMouseUp);
 		};
 	}, [handleMouseUp]);
 
 	React.useEffect(() => {
-		window.addEventListener("mousemove", handleMouseMove);
+		document.addEventListener("mousemove", handleMouseMove);
 		return () => {
-			window.removeEventListener("mousemove", handleMouseMove);
+			document.removeEventListener("mousemove", handleMouseMove);
 		};
 	}, [handleMouseMove]);
 
