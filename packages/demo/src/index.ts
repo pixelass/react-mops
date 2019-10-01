@@ -1,5 +1,6 @@
 import {createElement} from "react";
 import {hydrate} from "react-dom";
+import "react-mops/react-mops.css";
 import {BrowserRouter} from "react-router-dom";
 import {App} from "./app";
 

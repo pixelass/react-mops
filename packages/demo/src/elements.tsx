@@ -81,8 +81,9 @@ export const Container = styled.div<{ withGrid?: { x: number; y: number }; hasBo
 		`}
 `;
 export const Inner = styled.div`
-	background-image: linear-gradient(180deg, hsl(340, 100%, 40%), hsl(340, 100%, 30%));
-	color: hsl(340, 100%, 80%);
+	background-color: hsl(250, 100%, 50%);
+	background-image: linear-gradient(180deg, hsla(0, 0%, 0%, 0.1), hsla(0, 0%, 0%, 0.5));
+	color: hsla(0, 0%, 100%, 0.4);
 	display: flex;
 	align-items: center;
 	align-content: center;

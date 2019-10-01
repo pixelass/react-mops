@@ -1,7 +1,9 @@
 const path = require("path");
-import url from "rollup-plugin-url"
-import {createBanner, getPlugins} from "@ngineer/config-rollup/typescript";
+const url = require("rollup-plugin-url");
+const {createBanner, getPlugins} = require("@ngineer/config-rollup/typescript");
+const postcss = require("rollup-plugin-postcss");
 
+const autoprefixer = require("autoprefixer");
 
 module.exports = () => {
 	const cwd = process.cwd();
@@ -28,6 +30,13 @@ module.exports = () => {
 			],
 			plugins: [
 				url(),
+				postcss({
+					extract: true,
+					modules: {
+						generateScopedName:
+							process.env === "production" ? "[hash:base64:5]" : "[local]"
+					}
+				}),
 				...getPlugins(tsconfig)
 			]
 		}

@@ -20,7 +20,6 @@ import {
 	Example,
 	Examples,
 	Headline,
-	Icon,
 	Inner,
 	InvisibleMarker,
 	StyledBox,
@@ -244,8 +243,8 @@ export function Home() {
 										onRotateEnd={b => {
 											updateItem({uuid, ...b});
 										}}
-										minHeight={100}
-										minWidth={100}
+										// minHeight={100} // not implemented
+										// minWidth={100} // not implemented
 										marker={showMarkers ? undefined : InvisibleMarker}
 										fullHandles={!showMarkers}
 										size={size}
@@ -255,9 +254,7 @@ export function Home() {
 											...shouldSnap,
 											hasSiblings && toSiblings(items.filter(item => item.uuid !== uuid))
 										].filter(Boolean)}>
-										<Inner >
-											<Icon icon="M15,20H9V12H4.16L12,4.16L19.84,12H15V20Z"/>
-										</Inner>
+										<Inner />
 									</Box>
 								))}
 							</Container>

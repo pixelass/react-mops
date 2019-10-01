@@ -301,14 +301,16 @@ export const Box: React.RefForwardingComponent<
 							metaKey
 						}}>
 						<Handles style={contentStyle} draw={drawBox}>
-							{handles.map(handle => (
-								<Handle
-									key={handle.variation}
-									{...handle}
-									marker={marker}
-									full={fullHandles}
-								/>
-							))}
+							{handles.map(handle => {
+								return (
+									<Handle
+										key={handle.variation}
+										{...handle}
+										marker={marker}
+										full={fullHandles}
+									/>
+								)
+							})}
 						</Handles>
 					</PropProvider>
 				)}

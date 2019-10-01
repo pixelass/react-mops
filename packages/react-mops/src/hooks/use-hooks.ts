@@ -1,5 +1,5 @@
 import React from "react";
-import {rotationCursors} from "../cursors";
+import {rotationClasses} from "../cursors";
 import {to360} from "../utils";
 
 const OSX = "OSX";
@@ -82,7 +82,7 @@ export const useMeta = () => {
 export const useCursorSlice = rotation =>
 	React.useCallback(
 		n => {
-			return (Math.round(to360(rotation.z) / 45) + n) % rotationCursors.length;
+			return (Math.round(to360(rotation.z) / 45) + n) % rotationClasses.length;
 		},
 		[rotation]
 	);

@@ -1,0 +1,192 @@
+.handles {
+	bottom: 0;
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 2;
+}
+
+.forceHandle * {
+	cursor: var(--x1) 9 9, default;
+	cursor: -webkit-image-set(
+		var(--x1) 1x,
+		var(--x2) 2x
+	) 9 9, default;
+}
+
+.drawOutline {
+	box-shadow: 0 0 0 1px hsla(200, 100%, 25%, 0.75);
+}
+
+.boundingBox {
+	height: 100%;
+	pointer-events: none;
+	position: absolute;
+	width: 100%;
+}
+
+.handleBase {
+	height: 20px;
+	width: 20px;
+	pointer-events: all;
+	position: absolute;
+	visibility: visible;
+	z-index: 2;
+	cursor: var(--x1) 9 9, default;
+	cursor: -webkit-image-set(
+		var(--x1) 1x,
+		var(--x2) 2x
+	) 9 9, default;
+}
+
+.e {
+	right: -10px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 20px;
+}
+
+.n {
+	height: 20px;
+	left: 50%;
+	top: -10px;
+	transform: translateX(-50%);
+}
+
+.ne {
+	height: 20px;
+	right: -10px;
+	top: -10px;
+	width: 20px;
+}
+
+.nw {
+	height: 20px;
+	left: -10px;
+	top: -10px;
+	width: 20px;
+}
+
+.s {
+	bottom: -10px;
+	height: 20px;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.se {
+	bottom: -10px;
+	height: 20px;
+	right: -10px;
+	width: 20px;
+}
+
+.sw {
+	bottom: -10px;
+	height: 20px;
+	left: -10px;
+	width: 20px;
+}
+
+.w {
+	left: -10px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 20px;
+}
+
+.full {
+	height: 100%;
+	width: 100%;
+}
+
+.handleMarker {
+	background: white;
+	box-shadow: 0 0 0 1px black;
+	height: 5px;
+	left: 50%;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 5px;
+	pointer-events: none;
+}
+
+.wrapper {
+	align-content: center;
+	align-items: center;
+	display: flex;
+	justify-content: center;
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+}
+
+.content {
+	max-height: 100%;
+	max-width: 100%;
+	pointer-events: all;
+	z-index: 1;
+}
+
+.move {
+	cursor: move;
+}
+
+.colResize {
+	cursor: col-resize;
+}
+.nwseResize {
+	cursor: nwse-resize;
+}
+.rowResize {
+	cursor: row-resize;
+}
+.neswResize {
+	cursor: nesw-resize;
+}
+
+
+.eRotate {
+	--x1: url("./cursors/images/e-rotate.png");
+	--x2: url("./cursors/images/e-rotate@2x.png");
+}
+
+.nRotate {
+	--x1: url("./cursors/images/n-rotate.png");
+	--x2: url("./cursors/images/n-rotate@2x.png");
+}
+
+.neRotate {
+	--x1: url("./cursors/images/ne-rotate.png");
+	--x2: url("./cursors/images/ne-rotate@2x.png");
+}
+
+.nwRotate {
+	--x1: url("./cursors/images/nw-rotate.png");
+	--x2: url("./cursors/images/nw-rotate@2x.png");
+}
+
+.wRotate {
+	--x1: url("./cursors/images/w-rotate.png");
+	--x2: url("./cursors/images/w-rotate@2x.png");
+}
+
+.swRotate {
+	--x1: url("./cursors/images/sw-rotate.png");
+	--x2: url("./cursors/images/sw-rotate@2x.png");
+}
+
+.sRotate {
+	--x1: url("./cursors/images/s-rotate.png");
+	--x2: url("./cursors/images/s-rotate@2x.png");
+}
+
+.seRotate {
+	--x1: url("./cursors/images/s-rotate.png");
+	--x2: url("./cursors/images/s-rotate@2x.png");
+}
+

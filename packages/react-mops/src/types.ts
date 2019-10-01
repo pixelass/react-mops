@@ -160,32 +160,24 @@ export namespace Mops {
 		ne
 	}
 	export type HandleVariation = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
-	export interface HandleProps {
-		style?: React.CSSProperties;
+	export interface HandleProps extends React.HTMLAttributes<HTMLAnchorElement> {
 		variation: Mops.HandleVariation;
 		isResizable?: boolean;
 		isRotatable?: boolean;
+		isMouseDown?: boolean;
 		metaKey?: boolean;
 		ref?: React.Ref<HTMLAnchorElement>;
 		marker?: React.ComponentType<{style?: React.CSSProperties}>;
-		onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
-		onMouseDown?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
-		onMouseUp?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
-		onMouseMove?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 	}
 
-	export interface WrapperProps {
-		className?: string;
+	export interface WrapperProps extends React.HTMLAttributes<HTMLElement> {
 		isDown?: boolean;
 		as?: keyof JSX.IntrinsicElements | React.ComponentType<any>;
 		ref?: React.Ref<HTMLElement>;
-		style?: React.CSSProperties;
 	}
 
-	export interface ContentProps {
-		onMouseDown?: (e: React.MouseEvent) => void;
+	export interface ContentProps extends React.HTMLAttributes<HTMLDivElement> {
 		ref?: React.Ref<HTMLDivElement>;
-		style?: React.CSSProperties;
 	}
 
 	export interface ProviderProps {
