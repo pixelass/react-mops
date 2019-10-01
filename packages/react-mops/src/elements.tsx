@@ -72,8 +72,8 @@ const HandleBase: React.RefForwardingComponent<
 						<HandleLogic
 							{...props}
 							className={cx(className, styles.handleBase, {
-								[styles[resizeClassName]]: !metaKey && isResizable,
-								[styles[rotationClassName]]: metaKey && isRotatable
+								[resizeClassName]: !metaKey && isResizable,
+								[rotationClassName]: metaKey && isRotatable
 							})}
 							ref={ref}
 							onClick={handleClick}
