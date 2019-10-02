@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "lerna run dev --parallel",
     "build": "lerna run build --stream",
-    "nco": "lerna exec 'ncu -u'",
+    "ncu": "ncu - u; lerna exec 'ncu -u'",
     "prerelease": "lerna run build --scope react-mops",
     "release": "lerna publish --conventional-commits",
     "release:next": "yarn prerelease && lerna publish --canary --preid next --pre-dist-tag next",
@@ -22,7 +22,7 @@
   "dependencies": {
     "concurrently": "4.1.2",
     "lerna": "3.16.4",
-    "npm-check-updates": "3.1.22",
+    "npm-check-updates": "3.1.23",
     "prettier": "1.18.2",
     "sort-package-json": "1.22.1"
   },
