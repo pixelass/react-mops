@@ -309,7 +309,7 @@ export const Box: React.RefForwardingComponent<
 										marker={marker}
 										full={fullHandles}
 									/>
-								)
+								);
 							})}
 						</Handles>
 					</PropProvider>

@@ -28,7 +28,6 @@ import {
 	Wrapper
 } from "../elements";
 
-
 export function Home() {
 	const [items, setItems] = React.useState<Mops.Sibling[]>([]);
 	const [isDraggable, setDraggable] = React.useState(true);
@@ -76,26 +75,25 @@ export function Home() {
 	};
 
 	const shouldSnap: Mops.SnapHandler[] = React.useMemo(
-		() =>
-			[
-				hasGrid ? toGrid(gridSize) : undefined,
-				hasGuides
-					? toGuides({
-							threshold: {
-								x: gridSize.x / 2,
-								y: gridSize.y / 2
-							}
-					  })
-					: undefined,
-				hasBounds
-					? toBounds({
-							bottom: containerSize.height,
-							left: 0,
-							right: containerSize.width,
-							top: 0
-					  })
-					: undefined
-			],
+		() => [
+			hasGrid ? toGrid(gridSize) : undefined,
+			hasGuides
+				? toGuides({
+						threshold: {
+							x: gridSize.x / 2,
+							y: gridSize.y / 2
+						}
+				  })
+				: undefined,
+			hasBounds
+				? toBounds({
+						bottom: containerSize.height,
+						left: 0,
+						right: containerSize.width,
+						top: 0
+				  })
+				: undefined
+		],
 		[hasBounds, hasGrid, hasGuides, isDraggable, isResizable, isRotatable]
 	);
 	React.useEffect(() => {
@@ -252,7 +250,8 @@ export function Home() {
 										rotation={rotation}
 										shouldSnap={[
 											...shouldSnap,
-											hasSiblings && toSiblings(items.filter(item => item.uuid !== uuid))
+											hasSiblings &&
+												toSiblings(items.filter(item => item.uuid !== uuid))
 										].filter(Boolean)}>
 										<Inner />
 									</Box>

@@ -7,9 +7,8 @@ export const Wrapper = styled.div`
 	margin: 10px auto;
 	padding: 10px;
 	border-radius: 2px;
-	box-shadow: 0 0 0 1px hsla(0, 0%, 0%, 0.5);;
+	box-shadow: 0 0 0 1px hsla(0, 0%, 0%, 0.5);
 	width: ${containerSize.width + 40}px;
-
 `;
 export const Examples = styled.div`
 	position: relative;
@@ -24,10 +23,10 @@ export const Headline = styled.h2`
 	margin: 0;
 	font-size: 2em;
 	font-weight: lighter;
-		color:  hsla(0, 0%, 0%, 0.5);
+	color: hsla(0, 0%, 0%, 0.5);
 	&:first-letter {
 		font-weight: bolder;
-		color:  hsla(0, 0%, 0%, 0.8);
+		color: hsla(0, 0%, 0%, 0.8);
 	}
 `;
 
@@ -35,16 +34,16 @@ export const SubHeadline = styled.h3`
 	margin: 0;
 	font-size: 1.5em;
 	font-weight: lighter;
-		color:  hsla(0, 0%, 0%, 0.8);
+	color: hsla(0, 0%, 0%, 0.8);
 `;
 
 export const Title = styled.h1`
 	margin: 0;
 	font-size: 3em;
 	font-weight: bolder;
-		color:  hsla(0, 0%, 0%, 0.8);
+	color: hsla(0, 0%, 0%, 0.8);
 `;
-export const Container = styled.div<{ withGrid?: { x: number; y: number }; hasBounds?: boolean }>`
+export const Container = styled.div<{withGrid?: {x: number; y: number}; hasBounds?: boolean}>`
 	--line-width: 1px;
 	--line-color: rgba(0, 0, 0, 0.2);
 	margin: 50px 20px;
@@ -55,8 +54,8 @@ export const Container = styled.div<{ withGrid?: { x: number; y: number }; hasBo
 	box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2), 0 7px 14px rgba(0, 0, 0, 0.5);
 	border-radius: 3px;
 	${({withGrid}) =>
-	withGrid &&
-	css`
+		withGrid &&
+		css`
 			&::before {
 				content: "";
 				position: absolute;
@@ -118,7 +117,7 @@ export const StyledImage = styled.img`
 	height: 100%;
 	width: 100%;
 `;
-export const Button = styled.button<{ isActive?: boolean }>`
+export const Button = styled.button<{isActive?: boolean}>`
 	position: relative;
 	padding: 0.25rem 1rem;
 	border: 0;
@@ -129,7 +128,7 @@ export const Button = styled.button<{ isActive?: boolean }>`
 	font-weight: lighter;
 	${({isActive}) => css`
 		background: ${isActive ? "hsl(220, 80%, 40%)" : "#fff"};
-		color:  ${isActive ? "#fff" : "#000"};
+		color: ${isActive ? "#fff" : "#000"};
 		&:hover {
 			background: ${isActive ? "hsl(220, 80%, 20%)" : "#ddd"};
 		}
@@ -142,12 +141,12 @@ export const Button = styled.button<{ isActive?: boolean }>`
 export const ButtonWrapper = styled.div`
 	display: flex;
 	margin: 0.25rem;
-	
+
 	${Button} {
 		border-radius: 0;
 		margin: 0;
-		box-shadow: inset 1px 0 0 rgba(0,0,0,0.5);
-		
+		box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.5);
+
 		&:first-child {
 			border-radius: 3px 0 0 3px;
 			box-shadow: none;
@@ -171,7 +170,8 @@ export const Path = styled.path`
 	fill: currentColor;
 `;
 
-export const Icon = ({icon, ...props}) => <Svg>
-	<Path d={icon}/>
-</Svg>;
-
+export const Icon = ({icon, ...props}) => (
+	<Svg>
+		<Path d={icon} />
+	</Svg>
+);

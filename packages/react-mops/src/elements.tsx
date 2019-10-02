@@ -24,7 +24,11 @@ const HandleLogic: React.RefForwardingComponent<
 			document.body.classList.remove(...resizeClasses, ...rotationClasses);
 			document.body.classList.add(cursorSlice, styles.forceHandle);
 		} else {
-			document.body.classList.remove(...resizeClasses, ...rotationClasses, styles.forceHandle);
+			document.body.classList.remove(
+				...resizeClasses,
+				...rotationClasses,
+				styles.forceHandle
+			);
 		}
 	}, [cursorSlice]);
 	return (

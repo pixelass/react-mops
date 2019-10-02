@@ -10,10 +10,7 @@
 
 .forceHandle * {
 	cursor: var(--x1) 9 9, default;
-	cursor: -webkit-image-set(
-		var(--x1) 1x,
-		var(--x2) 2x
-	) 9 9, default;
+	cursor: -webkit-image-set(var(--x1) 1x, var(--x2) 2x) 9 9, default;
 }
 
 .drawOutline {
@@ -35,10 +32,7 @@
 	visibility: visible;
 	z-index: 2;
 	cursor: var(--x1) 9 9, default;
-	cursor: -webkit-image-set(
-		var(--x1) 1x,
-		var(--x2) 2x
-	) 9 9, default;
+	cursor: -webkit-image-set(var(--x1) 1x, var(--x2) 2x) 9 9, default;
 }
 
 .full {
@@ -149,7 +143,6 @@
 	cursor: nesw-resize;
 }
 
-
 .eRotate {
 	--x1: url("./cursors/images/e-rotate.png");
 	--x2: url("./cursors/images/e-rotate@2x.png");
@@ -189,4 +182,3 @@
 	--x1: url("./cursors/images/se-rotate.png");
 	--x2: url("./cursors/images/se-rotate@2x.png");
 }
-

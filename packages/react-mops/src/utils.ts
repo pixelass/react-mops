@@ -37,9 +37,9 @@ export const coordinatesToDeg = (
 	return to360((Math.atan2(y, x) * 180) / Math.PI);
 };
 
-export const normalize = (n) => {
+export const normalize = n => {
 	const rounded = Math.round(n * 10000) / 10000;
-	if (rounded === 0 ||rounded === -0) {
+	if (rounded === 0 || rounded === -0) {
 		return 0;
 	}
 	return rounded;

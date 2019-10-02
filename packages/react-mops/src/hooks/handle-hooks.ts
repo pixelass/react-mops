@@ -54,51 +54,48 @@ export const useHandles = ({
 	setRightDown,
 	setTopDown
 }): Mops.HandleProps[] =>
-	React.useMemo(
-		() => {
-			return [
-				{
-					onMouseDown: setTopDown,
-					variation: "n"
-				},
-				{
-					onMouseDown: setRightDown,
-					variation: "e"
-				},
-				{
-					onMouseDown: setBottomDown,
-					variation: "s"
-				},
-				{
-					onMouseDown: setLeftDown,
-					variation: "w"
-				},
-				{
-					onMouseDown: setTopRightDown,
-					variation: "ne"
-				},
-				{
-					onMouseDown: setBottomRightDown,
-					variation: "se"
-				},
-				{
-					onMouseDown: setBottomLeftDown,
-					variation: "sw"
-				},
-				{
-					onMouseDown: setTopLeftDown,
-					variation: "nw"
-				}
-			]
-		},
-		[
-			setBottomRightDown,
-			setTopLeftDown,
-			setBottomLeftDown,
-			setTopRightDown,
-			setLeftDown,
-			setBottomDown,
-			setRightDown,
-			setTopDown
-		]
-	);
+	React.useMemo(() => {
+		return [
+			{
+				onMouseDown: setTopDown,
+				variation: "n"
+			},
+			{
+				onMouseDown: setRightDown,
+				variation: "e"
+			},
+			{
+				onMouseDown: setBottomDown,
+				variation: "s"
+			},
+			{
+				onMouseDown: setLeftDown,
+				variation: "w"
+			},
+			{
+				onMouseDown: setTopRightDown,
+				variation: "ne"
+			},
+			{
+				onMouseDown: setBottomRightDown,
+				variation: "se"
+			},
+			{
+				onMouseDown: setBottomLeftDown,
+				variation: "sw"
+			},
+			{
+				onMouseDown: setTopLeftDown,
+				variation: "nw"
+			}
+		];
+	}, [
+		setBottomRightDown,
+		setTopLeftDown,
+		setBottomLeftDown,
+		setTopRightDown,
+		setLeftDown,
+		setBottomDown,
+		setRightDown,
+		setTopDown
+	]);

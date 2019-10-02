@@ -13,7 +13,7 @@ module.exports = (env, argv) =>
 						}
 					]
 				}
-				]
+			]
 		},
 		resolve: {
 			extensions: [".ts", ".tsx", ".mjs", ".js", ".jsx"]
