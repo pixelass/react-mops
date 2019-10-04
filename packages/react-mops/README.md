@@ -51,7 +51,7 @@ to an Element as seen in design software like Photoshop, Sketch any many others.
 **NPM**
 
 ```shell
-npm install react-mops --save-dev
+npm install react-mops --save
 ```
 
 **Yarn**
