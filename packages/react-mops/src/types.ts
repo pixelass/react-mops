@@ -96,7 +96,7 @@ export namespace Mops {
 	 * @param {BoundingBox} boundingBox
 	 *
 	 */
-	export type EventHandler = (boundingBox: BoundingBox) => void;
+	export type EventHandler = (boundingBox: Partial<BoundingBox>) => void;
 
 	/**
 	 * @typedef BoxProps

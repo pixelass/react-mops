@@ -1,36 +1,12 @@
 import React from "react";
 import {rotationClasses} from "../cursors";
+import {isOSX} from "../os";
 import {to360} from "../utils";
 
-const OSX = "OSX";
-const WINDOWS = "WINDOWS";
-const LINUX = "LINUX";
-const UNIX = "UNIX";
-const NODE = "UNIX";
-
-const getOS = () => {
-	if ("navigator" in global) {
-		if (navigator.appVersion.indexOf("Win") !== -1) {
-			return WINDOWS;
-		}
-		if (navigator.appVersion.indexOf("Mac") !== -1) {
-			return OSX;
-		}
-		if (navigator.appVersion.indexOf("X11") !== -1) {
-			return UNIX;
-		}
-		if (navigator.appVersion.indexOf("Linux") !== -1) {
-			return LINUX;
-		}
-	}
-	return NODE;
-};
-
-const isOSX = () => getOS() === OSX;
 /**
  *
  */
-export const useMeta = () => {
+export const useMetaOld = () => {
 	const [metaKey, setMetaKey] = React.useState(false);
 	const key = isOSX() ? "Meta" : "Control";
 	const handleKeyDown = React.useCallback(

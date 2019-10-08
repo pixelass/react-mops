@@ -1,11 +1,6 @@
 # M.O.P.S.
 **M**odify **O**rientation **P**osition **S**ize
 
-> German >> English: **Mops**  >> **Pug**  
-> it moves, it stretches, it rolls around  
-
-<p align="center"><img src="https://dekk-app.github.io/react-mops/logo.jpg" alt="M.O.P.S. logo"></p>
-
 <!-- toc -->
 
 - [Value Proposition](#value-proposition)
@@ -32,18 +27,18 @@ to an Element as seen in design software like Photoshop, Sketch any many others.
 * [x] Resize
   * [x] Alt key: resize left/right, top/bottom or all directions for corners
   * [x] Shift key: retain aspect-ratio
-  * [ ] Snapping
-  * [ ] Touch support
+  * [x] Snapping
+  * [x] Touch support
   * [ ] Keyboard support
 * [x] Rotate
   * [x] Meta key: activate rotation
   * [x] Shift key: rotate in steps of 15 deg
-  * [ ] Snapping
-  * [ ] Touch support
+  * [x] Snapping
+  * [x] Touch support
   * [ ] Keyboard support
 * [x] Drag
   * [x] Snapping
-  * [ ] Touch support
+  * [x] Touch support
   * [ ] Keyboard support
 
 ## Installation
@@ -126,8 +121,5 @@ https://codesandbox.io/s/react-mops-4cwhx
 **Combined**
 
 ![combined](https://dekk-app.github.io/react-mops/mops_combined_01.gif)
-
-
-Pug icons [created by freepik - www.freepik.com](https://www.freepik.com/free-photos-vectors/design);
 
 

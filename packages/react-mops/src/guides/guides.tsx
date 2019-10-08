@@ -24,7 +24,7 @@ export const GuidesProvider: React.FunctionComponent<{
 	containerSize: Mops.ContainerSize;
 }> = ({children, guideRequests, containerSize}) => {
 	const [guides, setGuides] = React.useState<Mops.Guide[]>([]);
-	const addGuides = guideModels => {
+	const addGuides = React.useCallback(guideModels => {
 		setGuides(state => {
 			const newGuides = guideModels.filter(
 				({uuid}) =>
@@ -38,8 +38,8 @@ export const GuidesProvider: React.FunctionComponent<{
 				$push: newGuides
 			});
 		});
-	};
-	const removeGuides = uuids => {
+	}, [setGuides]);
+	const removeGuides = React.useCallback(uuids => {
 		setGuides(state => {
 			return uuids
 				? update(state, {
@@ -56,39 +56,46 @@ export const GuidesProvider: React.FunctionComponent<{
 				  })
 				: [];
 		});
-	};
-	const showGuides = uuids => {
+	}, [setGuides]);
+	const showGuides = React.useCallback(uuids => {
 		setGuides(state =>
 			update(
 				state,
 				(uuids || state.map(({uuid}) => uuid)).reduce((previousValue, currentValue) => {
 					const index = state.findIndex(({uuid}) => uuid === currentValue);
-					return {...previousValue, [index]: {visible: {$set: true}}};
+					return index > -1
+						? {...previousValue, [index]: {visible: {$set: true}}}
+						: previousValue;
 				}, {})
 			)
 		);
-	};
-	const hideGuides = uuids => {
+	}, [setGuides]);
+	const hideGuides = React.useCallback(uuids => {
 		setGuides(state =>
 			update(
 				state,
 				(uuids || state.map(({uuid}) => uuid)).reduce((previousValue, currentValue) => {
 					const index = state.findIndex(({uuid}) => uuid === currentValue);
-					return {...previousValue, [index]: {visible: {$set: false}}};
+					return index > -1
+						? {...previousValue, [index]: {visible: {$set: false}}}
+						: previousValue;
 				}, {})
 			)
 		);
-	};
+	}, [setGuides]);
 
-	const updateGuide = partialItem => {
-		setGuides(state =>
-			update(state, {
-				[state.findIndex(({uuid}) => uuid === partialItem.uuid)]: {
-					$merge: partialItem
-				}
-			})
-		);
-	};
+	const updateGuide = React.useCallback(partialItem => {
+		setGuides(state => {
+			const index = state.findIndex(({uuid}) => uuid === partialItem.uuid);
+			return index > -1
+				? update(state, {
+						[index]: {
+							$merge: partialItem
+						}
+				  })
+				: state;
+		});
+	}, [setGuides]);
 	React.useEffect(() => {
 		if (guideRequests) {
 			const guideModels = guideRequests.map(({uuid, x, y}) => {
@@ -121,12 +128,12 @@ export const GuidesProvider: React.FunctionComponent<{
 	return (
 		<Provider
 			value={{
+				addGuides,
 				guideRequests,
 				guides,
-				addGuides,
+				hideGuides,
 				removeGuides,
 				showGuides,
-				hideGuides,
 				updateGuide
 			}}>
 			{children}

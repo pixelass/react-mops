@@ -3,8 +3,6 @@ const url = require("rollup-plugin-url");
 const {createBanner, getPlugins} = require("@ngineer/config-rollup/typescript");
 const postcss = require("rollup-plugin-postcss");
 
-const autoprefixer = require("autoprefixer");
-
 module.exports = () => {
 	const cwd = process.cwd();
 	const pkg = require(path.resolve(cwd, "package.json"));
