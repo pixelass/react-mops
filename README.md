@@ -1,11 +1,6 @@
 # M.O.P.S
 **M**odify **O**rientation **P**osition **S**ize
 
-> German >> English: **Mops**  >> **Pug**  
-> it moves, it stretches, it rolls around  
-
-<p align="center"><img src="https://dekk-app.github.io/react-mops/logo.jpg" alt="M.O.P.S. logo"></p>
-
 [![MIT license][license-badge]][license]
 [![Code of Conduct][coc-badge]][coc]
 

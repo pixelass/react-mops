@@ -21,15 +21,14 @@ import {
 	Examples,
 	Headline,
 	Inner,
-	InvisibleMarker,
-	StyledBox,
 	SubHeadline,
 	Title,
 	Wrapper
 } from "../elements";
 
+
 export function Home() {
-	const [items, setItems] = React.useState<Mops.Sibling[]>([]);
+	const [items, setItems] = React.useState<Array<Mops.Sibling & {backgroundColor?: string}>>([]);
 	const [isDraggable, setDraggable] = React.useState(true);
 	const [isResizable, setResizable] = React.useState(true);
 	const [isRotatable, setRotatable] = React.useState(true);
@@ -37,8 +36,8 @@ export function Home() {
 	const [showBox, setBox] = React.useState(false);
 	const [showBoundingBox, setBoundingBox] = React.useState(false);
 	const [hasGrid, setGrid] = React.useState(false);
-	const [hasBounds, setBounds] = React.useState(true);
-	const [hasGuides, setGuides] = React.useState(false);
+	const [hasBounds, setBounds] = React.useState(false);
+	const [hasGuides, setGuides] = React.useState(true);
 	const [hasSiblings, setSiblings] = React.useState(true);
 
 	const updateItem = (item: Mops.Sibling) =>
@@ -49,16 +48,19 @@ export function Home() {
 					$merge: item
 				}
 			};
-			return update(state, $spec);
+			return index > -1 ? update(state, $spec) : state;
 		});
 
 	const addItem = () => {
+		const height = Math.round(Math.random() * 200) + 100;
+		const width = Math.round(Math.random() * 200) + 100;
 		setItems(state => [
 			...state,
 			{
+				backgroundColor: `hsl(${Math.round(Math.random() * 360)}, 100%, 50%)`,
 				position: {
-					x: 50,
-					y: 50
+					x: width / 2,
+					y: height / 2
 				},
 				rotation: {
 					x: 0,
@@ -66,8 +68,8 @@ export function Home() {
 					z: 0
 				},
 				size: {
-					height: 100,
-					width: 100
+					height,
+					width
 				},
 				uuid: uuidV4()
 			}
@@ -223,28 +225,58 @@ export function Home() {
 								withGrid={hasGrid ? gridSize : undefined}
 								hasBounds={hasBounds}>
 								<Guides />
-								{items.map(({uuid, size, position, rotation}, i) => (
+								{items.map(({uuid, size, position, rotation, backgroundColor}) => (
 									<Box
 										key={uuid}
-										as={StyledBox}
-										drawBoundingBox={showBoundingBox}
-										drawBox={showBox}
+										// as={StyledBox}
+										// drawBoundingBox={showBoundingBox}
+										// drawBox={showBox}
 										isDraggable={isDraggable}
 										isResizable={isResizable}
 										isRotatable={isRotatable}
-										onDragEnd={b => {
-											updateItem({uuid, ...b});
+										onDragStart={() => {
+											// tslint:disable-next-line:no-console
+											console.log("position:start");
 										}}
-										onResizeEnd={b => {
-											updateItem({uuid, ...b});
+										onDrag={() => {
+											// tslint:disable-next-line:no-console
+											console.log("position:move");
+										}}
+										onDragEnd={b => {
+											// tslint:disable-next-line:no-console
+											console.log("position:end");
+											updateItem({uuid, rotation, position, size, ...b});
+										}}
+										onRotateStart={() => {
+											// tslint:disable-next-line:no-console
+											console.log("rotate:start");
+										}}
+										onRotate={() => {
+											// tslint:disable-next-line:no-console
+											console.log("rotate:move");
 										}}
 										onRotateEnd={b => {
-											updateItem({uuid, ...b});
+											// tslint:disable-next-line:no-console
+											console.log("rotate:end");
+											updateItem({uuid, rotation, position, size, ...b});
+										}}
+										onResizeStart={() => {
+											// tslint:disable-next-line:no-console
+											console.log("resize:start");
+										}}
+										onResize={() => {
+											// tslint:disable-next-line:no-console
+											console.log("resize:move");
+										}}
+										onResizeEnd={b => {
+											// tslint:disable-next-line:no-console
+											console.log("resize:end");
+											updateItem({uuid, rotation, position, size, ...b});
 										}}
 										// minHeight={100} // not implemented
 										// minWidth={100} // not implemented
-										marker={showMarkers ? undefined : InvisibleMarker}
-										fullHandles={!showMarkers}
+										// marker={showMarkers ? undefined : InvisibleMarker}
+										// fullHandles={!showMarkers}
 										size={size}
 										position={position}
 										rotation={rotation}
@@ -253,7 +285,7 @@ export function Home() {
 											hasSiblings &&
 												toSiblings(items.filter(item => item.uuid !== uuid))
 										].filter(Boolean)}>
-										<Inner />
+										<Inner style={{backgroundColor}} />
 									</Box>
 								))}
 							</Container>

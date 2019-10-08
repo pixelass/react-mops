@@ -80,8 +80,8 @@ export const Container = styled.div<{withGrid?: {x: number; y: number}; hasBound
 		`}
 `;
 export const Inner = styled.div`
-	background-color: hsl(250, 100%, 50%);
-	background-image: linear-gradient(180deg, hsla(0, 0%, 0%, 0.1), hsla(0, 0%, 0%, 0.5));
+	background-color: hsl(300, 100%, 50%);
+	background-image: linear-gradient(180deg, hsla(0, 0%, 100%, 0.1), hsla(0, 0%, 0%, 0.1));
 	color: hsla(0, 0%, 100%, 0.4);
 	display: flex;
 	align-items: center;
@@ -89,7 +89,7 @@ export const Inner = styled.div`
 	justify-content: center;
 	height: 100%;
 	width: 100%;
-	border-radius: 2px;
+	border-radius: 10px;
 `;
 export const StyledMarker = styled.span`
 	position: absolute;
