@@ -87,6 +87,7 @@ const Handle: React.FunctionComponent<{
 			margin: position === "outside" ? -30 : -10,
 			pointerEvents: "all",
 			position: "absolute",
+			touchAction: "none",
 			width: position === "outside" ? 60 : 20,
 			...handleVariations[variation]
 		}}>
@@ -103,6 +104,7 @@ const Marker = () => (
 			left: "50%",
 			position: "absolute",
 			top: "50%",
+			touchAction: "none",
 			transform: "translate(-50%,-50%)",
 			width: 10,
 			zIndex: 2
@@ -291,6 +293,7 @@ const Box: React.FunctionComponent<BoxProps & Mops.GuidesContext> = ({
 			<div
 				style={{
 					position: "relative",
+					touchAction: "none",
 					...size
 				}}
 				onMouseDown={isDraggable ? positionProps.onMouseDown : undefined}

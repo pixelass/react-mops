@@ -1,5 +1,6 @@
 import React from "react";
 import {usePointer} from "./pointer";
+import {Mops} from "../types";
 
 export const useOffset = ({onDragStart, onDrag, onDragEnd}, initialState = {x: 0, y: 0}) => {
 	const [initialOffset, setInitialOffset] = React.useState<{x: number; y: number}>(initialState);
@@ -30,11 +31,11 @@ export const useOffset = ({onDragStart, onDrag, onDragEnd}, initialState = {x: 0
 		[handleMove]
 	);
 	const handleUp = React.useCallback(
-		pointer => {
-			const coords = {
+		(pointer?: Mops.PositionModel) => {
+			const coords = pointer ? {
 				x: pointer.x - initialOffset.x,
 				y: pointer.y - initialOffset.y
-			};
+			} : offset;
 			setOffset(coords);
 			onDragEnd(coords);
 		},
@@ -48,7 +49,7 @@ export const useOffset = ({onDragStart, onDrag, onDragEnd}, initialState = {x: 0
 	);
 	const onTouchEnd = React.useCallback(
 		(event: TouchEvent) => {
-			handleUp({x: event.touches[0].clientX, y: event.touches[0].clientY});
+			handleUp();
 		},
 		[handleUp]
 	);

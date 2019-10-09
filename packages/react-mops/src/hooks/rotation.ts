@@ -9,6 +9,9 @@ const useCartesianToPolar = (callback, node, deps) =>
 				return;
 			}
 			event.preventDefault();
+			if (x === undefined || y === undefined) {
+				return callback();
+			}
 			const {top, left, height, width} = node.getBoundingClientRect();
 			const {deg} = cartesianToPolar({
 				x: x - left - width / 2,
@@ -38,11 +41,11 @@ export const useRotation = (
 		[onRotate]
 	);
 	const handleUp = useCartesianToPolar(
-		newRotation => {
-			const deg = to360(newRotation - initialRotation);
-			setRotation(deg);
+		(newRotation: number) => {
+			const deg = newRotation !== undefined  ? to360(newRotation - initialRotation) : null;
+			setRotation(deg === null ? rotation : deg);
 			if (onRotateEnd) {
-				onRotateEnd(deg);
+				onRotateEnd(deg === null ? rotation : deg);
 			}
 		},
 		node,
@@ -82,12 +85,15 @@ export const useRotation = (
 		[handleDown]
 	);
 	const onMouseUp = React.useCallback(
-		(event: MouseEvent) => handleUp({x: event.clientX, y: event.clientY}, event),
+		(event: MouseEvent) => {
+			handleUp({x: event.clientX, y: event.clientY}, event)},
 		[handleUp]
 	);
 	const onTouchEnd = React.useCallback(
 		(event: TouchEvent) =>
-			handleUp({x: event.touches[0].clientX, y: event.touches[0].clientY}, event),
+		{
+				handleUp(rotation, event)
+			},
 		[handleUp]
 	);
 	const setDown = usePointer({
