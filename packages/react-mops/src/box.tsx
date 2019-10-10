@@ -1,6 +1,17 @@
 import React from "react";
 import {GuidesConsumer} from "./guides";
-import {Dir, useAlt, useMeta, usePosition, useRotate, useShift, useSize, useSnap} from "./hooks";
+import {
+	Dir,
+	useAlt,
+	useControl,
+	useMeta,
+	usePosition,
+	useRotate,
+	useShift,
+	useSize,
+	useSnap
+} from "./hooks";
+import {isOSX} from "./os";
 import {Mops} from "./types";
 
 const handleVariations = {
@@ -171,6 +182,7 @@ const Box: React.FunctionComponent<BoxProps & Mops.GuidesContext> = ({
 	const [isActive, setActive] = React.useState(false);
 	const [dir, setDir] = React.useState<Dir>({x: 0, y: 0});
 	const metaKey = useMeta();
+	const controlKey = useControl();
 	const altKey = useAlt();
 	const shiftKey = useShift();
 	const [rotate, rotateProps] = useRotate(initialRotation.z, {
@@ -280,7 +292,7 @@ const Box: React.FunctionComponent<BoxProps & Mops.GuidesContext> = ({
 							}}
 							onTouchStart={event => {
 								setDir(handleDirs[key]);
-								if (metaKey && isRotatable) {
+								if ((isOSX() ? metaKey : controlKey) && isRotatable) {
 									rotateProps.onTouchStart(event);
 								} else if (isResizable) {
 									sizeProps.onTouchStart(event);
