@@ -26,7 +26,6 @@ import {
 	Wrapper
 } from "../elements";
 
-
 export function Home() {
 	const [items, setItems] = React.useState<Array<Mops.Sibling & {backgroundColor?: string}>>([]);
 	const [isDraggable, setDraggable] = React.useState(true);
@@ -225,6 +224,7 @@ export function Home() {
 								withGrid={hasGrid ? gridSize : undefined}
 								hasBounds={hasBounds}>
 								<Guides />
+
 								{items.map(({uuid, size, position, rotation, backgroundColor}) => (
 									<Box
 										key={uuid}
