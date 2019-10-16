@@ -55,7 +55,7 @@
   },
   "dependencies": {
     "@types/classnames": "^2.2.9",
-    "@types/react": "^16.9.5",
+    "@types/react": "^16.9.7",
     "@types/uuid": "^3.4.5",
     "classnames": "2.2.6",
     "immutability-helper": "^3.0.1",
@@ -66,19 +66,18 @@
     "@ngineer/cli": "1.3.1",
     "@ngineer/configs": "1.3.1",
     "@ngineer/testing-utils": "1.3.1",
-    "@types/react-dom": "16.9.1",
-    "autoprefixer": "9.6.4",
+    "@types/react-dom": "16.9.2",
     "cssnano": "4.1.10",
     "postcss-url": "8.0.0",
-    "react": "16.10.1",
+    "react": "16.10.2",
     "react-dom": "16.10.2",
     "rollup-plugin-postcss": "2.0.3",
-    "rollup-plugin-url": "2.2.2",
+    "rollup-plugin-url": "2.2.4",
     "ts-node": "8.4.1",
     "typescript": "3.6.4"
   },
   "peerDependencies": {
-    "react": ">=16.10"
+    "react": ">=16.9"
   },
   "publishConfig": {
     "access": "public"

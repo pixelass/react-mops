@@ -27,10 +27,10 @@
   "dependencies": {
     "@ngineer/head": "1.3.1",
     "@ngineer/server": "1.3.1",
-    "@types/react": "16.9.5",
-    "@types/react-dom": "16.9.1",
+    "@types/react": "16.9.7",
+    "@types/react-dom": "16.9.2",
     "@types/react-hot-loader": "4.1.0",
-    "@types/react-router": "5.1.1",
+    "@types/react-router": "5.1.2",
     "@types/react-router-dom": "5.1.0",
     "@types/styled-components": "4.1.19",
     "@types/uuid": "^3.4.5",
