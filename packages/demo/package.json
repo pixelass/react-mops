@@ -1,6 +1,6 @@
 {
   "name": "demo",
-  "version": "1.0.0",
+  "version": "2.0.0-beta.0",
   "description": "Created with create-ngineer-app",
   "repository": "git@github.com:pixelass/demo.git",
   "license": "MIT",
@@ -39,7 +39,7 @@
     "react": "16.10.2",
     "react-dom": "16.10.2",
     "react-hot-loader": "4.12.15",
-    "react-mops": "^1.0.0",
+    "react-mops": "^2.0.0-beta.0",
     "react-router": "5.1.2",
     "react-router-dom": "5.1.2",
     "styled-components": "4.4.0",

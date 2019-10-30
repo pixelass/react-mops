@@ -1,6 +1,6 @@
 {
   "name": "react-mops",
-  "version": "1.0.0",
+  "version": "2.0.0-beta.0",
   "description": "Modify Orientation Position Size",
   "keywords": [
     "coordinates",
@@ -71,11 +71,11 @@
     "postcss-url": "8.0.0",
     "react": "16.10.2",
     "react-dom": "16.10.2",
-    "rollup-plugin-postcss": "2.0.3",
-    "rollup-plugin-json": "4.0.0",
     "rollup-plugin-babel": "4.3.3",
-    "rollup-plugin-url": "3.0.0",
+    "rollup-plugin-json": "4.0.0",
+    "rollup-plugin-postcss": "2.0.3",
     "rollup-plugin-ts": "0.2.0",
+    "rollup-plugin-url": "3.0.0",
     "ts-node": "8.4.1",
     "typescript": "3.6.4"
   },
