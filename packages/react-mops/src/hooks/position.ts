@@ -22,7 +22,7 @@ interface Props {
 
 export const usePosition = (
 	initialState: Position = {x: 0, y: 0},
-	{ onDragEnd, onDragStart, onDrag}: Props
+	{onDragEnd, onDragStart, onDrag}: Props
 ) => {
 	const [initialPosition, setInitialPosition] = React.useState<Position>(initialState);
 	const [position, setPosition] = React.useState<Position>(initialPosition);

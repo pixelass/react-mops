@@ -1,5 +1,6 @@
 import React from "react";
 import {useEventListener, useEventListeners} from "./event-listener";
+import {useDocument, useWindow} from "./globals";
 
 enum KEYS {
 	Alt = "Alt",
@@ -10,44 +11,41 @@ enum KEYS {
 
 export const useKey = key => {
 	const [isActive, setActive] = React.useState(false);
-	if ("window" in global) {
-		// Activate on keydown
-		useEventListener(
-			"keydown",
-			(event: KeyboardEvent) => {
-				if (event.key === key) {
-					setActive(true);
-				}
-			},
-			document,
-			[setActive, key]
-		);
+	const win = useWindow();
+	const doc = useDocument();
+	useEventListener(
+		"keydown",
+		(event: KeyboardEvent) => {
+			if (event.key === key) {
+				setActive(true);
+			}
+		},
+		doc,
+		[setActive, key]
+	);
 
-		// Deactivate on keyup
-		useEventListener(
-			"keyup",
-			(event: KeyboardEvent) => {
-				if (event.key === key) {
-					setActive(false);
-				}
-			},
-			document,
-			[setActive, key]
-		);
-
-		// Deactivate on window blur and focus
-		useEventListeners(
-			["focus", "blur"],
-			() => {
+	// Deactivate on keyup
+	useEventListener(
+		"keyup",
+		(event: KeyboardEvent) => {
+			if (event.key === key) {
 				setActive(false);
-			},
-			window,
-			[setActive]
-		);
+			}
+		},
+		doc,
+		[setActive, key]
+	);
 
-		return isActive;
-	}
-	return false;
+	// Deactivate on window blur and focus
+	useEventListeners(
+		["focus", "blur"],
+		() => {
+			setActive(false);
+		},
+		win,
+		[setActive]
+	);
+	return isActive;
 };
 
 export const useMeta = () => useKey(KEYS.Meta);

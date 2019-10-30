@@ -1,7 +1,10 @@
 const path = require("path");
 const url = require("rollup-plugin-url");
-const {createBanner, getPlugins} = require("@ngineer/config-rollup/typescript");
+const {createBanner} = require("@ngineer/config-rollup/typescript");
 const postcss = require("rollup-plugin-postcss");
+const babel = require("rollup-plugin-babel");
+const {default: ts} = require("rollup-plugin-ts");
+const json = require("rollup-plugin-json");
 
 module.exports = () => {
 	const cwd = process.cwd();
@@ -35,7 +38,11 @@ module.exports = () => {
 							process.env.NODE_ENV === "production" ? "[hash:base64:5]" : "[local]"
 					}
 				}),
-				...getPlugins(tsconfig)
+				json(),
+				babel(),
+				ts({
+					tsconfig
+				})
 			]
 		}
 	];

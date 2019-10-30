@@ -1,45 +1,11 @@
 # M.O.P.S.
+
 **M**odify **O**rientation **P**osition **S**ize
-
-<!-- toc -->
-
-- [Value Proposition](#value-proposition)
-- [Features](#features)
-- [Installation](#installation)
-- [Docs](#docs)
-  * [Basic Examples](#basic-examples)
-- [Demo](#demo)
-  * [Live](#live)
-  * [Screen recordings](#screen-recordings)
-
-<!-- tocstop -->
 
 ## Value Proposition
 
 M.O.P.S aims to provide a component that allows various transformations
 to an Element as seen in design software like Photoshop, Sketch any many others.
-
-## Features
-
-**(implemented / planned)**
-
-* [x] `<Guides/>` component
-* [x] Resize
-  * [x] Alt key: resize left/right, top/bottom or all directions for corners
-  * [x] Shift key: retain aspect-ratio
-  * [x] Snapping
-  * [x] Touch support
-  * [ ] Keyboard support
-* [x] Rotate
-  * [x] Meta key: activate rotation
-  * [x] Shift key: rotate in steps of 15 deg
-  * [x] Snapping
-  * [x] Touch support
-  * [ ] Keyboard support
-* [x] Drag
-  * [x] Snapping
-  * [x] Touch support
-  * [ ] Keyboard support
 
 ## Installation
 
@@ -57,69 +23,135 @@ yarn add react-mops
 
 ## Docs
 
-This an extracted component.
+### Components
 
-Tests and documentation has not been written **yet**. Please look at the [examples](https://github.com/dekk-app/react-mops/blob/master/packages/demo/src/pages/home.tsx#L99) for now 
+#### Box
 
-### Basic Examples
+### Hooks
+
+#### useShift `() => boolean;`
+
+listens for the shift key.
+
+#### useAlt `() => boolean;`
+
+listens for the alt/option key.
+
+#### useControl `() => boolean;`
+
+listens for the control/ctrl key.
+
+#### useMeta `() => boolean;`
+
+listens for the meta key.
+
+#### useRotation
+
+Hook to modify the orientation of an element.
+
+#### usePosition
+
+Hook to modify the position of an element.
+
+#### useSize
+
+Hook to modify the size of an element.
+
+#### useSnap
+
+Hook to enable snapping.
+
+#### useGuides
+
+Hook to draw guides.
+
+#### useCursors
+
+Hook to enable custom cursors. (requires css file)
+
+
+### Basic usage examples
 
 ```jsx
 import {Box} from "react-mops";
+import "react-mops/styles.css";
 
-const wrapperStyle = {
-    position: "relative",
-    height: 500,
-    width: 500,
-    boxShadow: "0 0 0 1px black"
-};
-const App = () => {
-    return (
-        <div style={wrapperStyle}>
-            <Box isResizable>
-                Resize me!
-            </Box>
-            <Box isRotatable>
-                Rotate me!
-            </Box>
-            <Box isDraggable>
-                Drag me!
-            </Box>
-            <Box isResizable isRotatable isDraggable>
-                I can do it all!
-            </Box>
-        </div>
-    );
-}
+const App = () => (
+    <div className="container">
+        <Box isResizable>Resize me!</Box>
+        <Box isRotatable>Rotate me!</Box>
+        <Box isDraggable>Drag me!</Box>
+        <Box isResizable isRotatable isDraggable>
+            I can do it all!
+        </Box>
+    </div>
+);
 ```
 
+### Homegrown
 
-## Demo
+M.O.P.S. provides hooks to build custom components.
 
-### Code Sandbox
+**rotatable.jsx**
 
-https://codesandbox.io/s/react-mops-4cwhx
+```jsx
+import {useRotation, useShift} from "react-mops";
 
-### Live
+const Rotatable = ({children, initialRotation, onRotate, onRotateEnd, onRotateStart, style}) => {
+    // Use Shift to rotate in steps
+    const shiftKey = useShift();
 
-[https://react-mops.netlify.com](https://react-mops.netlify.com)
+    // Hook options
+    const options = React.useMemo(
+        () => ({
+            onRotate,
+            onRotateEnd,
+            onRotateStart,
+            step: 45, // If steps are active rotation uses this value
+            steps: shiftKey // Activates steps
+        }),
+        [shiftKey]
+    );
 
-### Screen recordings
+    // Rotation Hook
+    const [
+        deg, // Current rotation (degree on z-axis)
+        {
+            onMouseDown, // Triggers rotation
+            onTouchStart, // Triggers rotation
+            ref // Element considered as rotation center
+        }
+    ] = useRotation(initialRotation, options);
 
-**Resizable**
+    // Dynamic element styles
+    const style = React.useMemo(
+        () => ({
+            ...style,
+            transform: `rotate3d(0, 0, 1, ${deg}deg)`
+        }),
+        [deg]
+    );
 
-![resizable](https://dekk-app.github.io/react-mops/mops_resizable_01.gif)
+    // Box with content and a dedicated handle to rotate the element
+    // The content is used to determind the rotation center (not anchor point)
+    return (
+        <div className="rotatable" style={style}>
+            <span
+                className="rotatable-handle"
+                onMouseDown={onMouseDown}
+                onTouchStart={onTouchStart}
+            />
+            <div ref={ref} className="rotatable-content">
+                {children}
+            </div>
+        </div>
+    );
+};
 
-**Rotatable**
+Rotatable.defaultProps = {
+    style: {},
+    initialRotation: 0
+};
 
-![rotatable](https://dekk-app.github.io/react-mops/mops_rotatable_01.gif)
-
-**Draggable**
-
-![draggable](https://dekk-app.github.io/react-mops/mops_draggable_01.gif)
-![draggable](https://dekk-app.github.io/react-mops/mops_draggable_02.gif)
-
-**Combined**
-
-![combined](https://dekk-app.github.io/react-mops/mops_combined_01.gif)
-
-
+export default Rotatable;
+```

@@ -1,45 +1,56 @@
 import {v4 as uuidV4} from "uuid";
 import {Mops} from "../types";
-import {degToRad, getBoundingBox, inRange} from "../utils";
+import {getBoundingBox, getInnerBox, inRange} from "../utils";
 
-export const toBounds = ({top, right, bottom, left}) => (
-	{position, size},
+export const toBounds = ({top, right, bottom, left}): Mops.SnapHandler => (
+	{position, size, rotation},
 	{},
-	model = position
+	model = {position, size}
 ) => {
+	const boundingBox = getBoundingBox({...size, angle: rotation.z});
 	const boundaries = {
-		bottom: bottom - size.height / 2,
-		left: left + size.width / 2,
-		right: right - size.width / 2,
-		top: top + size.height / 2
-	};
-	const snap: Mops.PositionModel = {
-		x: Math.max(boundaries.left, Math.min(boundaries.right, model.x)),
-		y: Math.max(boundaries.top, Math.min(boundaries.bottom, model.y))
-	};
-	return snap;
-};
-
-export const toGrid = ({x = 1, y = 1}) => ({position, size}, {}, model = position) => {
-	const half = {
-		x: size.width / 2,
-		y: size.height / 2
-	};
-	const snap = {
-		b: Math.round((model.y + half.y) / y) * y - half.y,
-		l: Math.round((model.x - half.x) / x) * x + half.x,
-		r: Math.round((model.x + half.x) / x) * x - half.x,
-		t: Math.round((model.y - half.y) / y) * y + half.y
-	};
-	const diff = {
-		b: Math.abs(model.y - snap.b),
-		l: Math.abs(model.x - snap.l),
-		r: Math.abs(model.x - snap.r),
-		t: Math.abs(model.y - snap.t)
+		bottom: bottom - boundingBox.height / 2,
+		left: left + boundingBox.width / 2,
+		right: right - boundingBox.width / 2,
+		top: top + boundingBox.height / 2
 	};
 	return {
-		x: diff.l < diff.r ? snap.l : snap.r,
-		y: diff.t < diff.b ? snap.t : snap.b
+		...model,
+		position: {
+			x: Math.max(boundaries.left, Math.min(boundaries.right, model.position.x)),
+			y: Math.max(boundaries.top, Math.min(boundaries.bottom, model.position.y))
+		}
+	};
+};
+
+export const toGrid = ({x = 1, y = 1}): Mops.SnapHandler => (
+	{position, size, rotation},
+	{},
+	model = {position, size}
+) => {
+	const boundingBox = getBoundingBox({...size, angle: rotation.z});
+	const half = {
+		x: boundingBox.width / 2,
+		y: boundingBox.height / 2
+	};
+	const snap = {
+		b: Math.round((model.position.y + half.y) / y) * y - half.y,
+		l: Math.round((model.position.x - half.x) / x) * x + half.x,
+		r: Math.round((model.position.x + half.x) / x) * x - half.x,
+		t: Math.round((model.position.y - half.y) / y) * y + half.y
+	};
+	const diff = {
+		b: Math.abs(model.position.y - snap.b),
+		l: Math.abs(model.position.x - snap.l),
+		r: Math.abs(model.position.x - snap.r),
+		t: Math.abs(model.position.y - snap.t)
+	};
+	return {
+		...model,
+		position: {
+			x: diff.l < diff.r ? snap.l : snap.r,
+			y: diff.t < diff.b ? snap.t : snap.b
+		}
 	};
 };
 
@@ -50,9 +61,9 @@ export const toGuides = ({
 		y: GUIDE_THRESHOLD
 	}
 }): Mops.SnapHandler => (
-	{position, size},
+	{position, size, rotation},
 	{guideRequests, guides, showGuides, hideGuides},
-	model = position
+	model = {position, size}
 ) => {
 	const tX = Math.max(GUIDE_THRESHOLD, thresholdX);
 	const tY = Math.max(GUIDE_THRESHOLD, thresholdY);
@@ -80,17 +91,24 @@ export const toGuides = ({
 		}
 		return snap;
 	}, {});
-	return {...model, ...withSnap};
+	return {...model, position: {...model.position, ...withSnap}};
 };
 
 const SIBLING_X = uuidV4();
 const SIBLING_Y = uuidV4();
 
-export const toSiblings = (siblings: Mops.Sibling[]): Mops.SnapHandler => (
+export const toSiblings = (
+	siblings: Mops.Sibling[],
+	{x: thresholdX = GUIDE_THRESHOLD, y: thresholdY = GUIDE_THRESHOLD}: Mops.PositionModel = {
+		x: GUIDE_THRESHOLD,
+		y: GUIDE_THRESHOLD
+	}
+): Mops.SnapHandler => (
 	{position, size, rotation},
-	{addGuides, removeGuides, updateGuide, guides},
-	model = position
+	{addGuides, removeGuides, updateGuide, guides, guideRequests, hideGuides},
+	model = {position, size}
 ) => {
+	const boundingBox = getBoundingBox({...model.size, angle: rotation.z});
 	const withBoundingBox = siblings.map(sibling => ({
 		...sibling,
 		boundingBox: getBoundingBox({
@@ -108,10 +126,10 @@ export const toSiblings = (siblings: Mops.Sibling[]): Mops.SnapHandler => (
 	const withSnap = withBoundingBox
 		.map(({uuid, ...item}): Partial<Mops.PositionModel> & {uuid: string} => ({
 			uuid,
-			x: inRange(model.x, item.position.x - 10, item.position.x + 10)
+			x: inRange(model.position.x, item.position.x - thresholdX, item.position.x + thresholdX)
 				? item.position.x
 				: undefined,
-			y: inRange(model.y, item.position.y - 10, item.position.y + 10)
+			y: inRange(model.position.y, item.position.y - thresholdY, item.position.y + thresholdY)
 				? item.position.y
 				: undefined
 		}))
@@ -131,22 +149,22 @@ export const toSiblings = (siblings: Mops.Sibling[]): Mops.SnapHandler => (
 					hasX && hadX
 						? Math.abs(
 								withBoundingBox.find(item => item.uuid === previousValue.x.uuid)
-									.position.y - model.y
+									.position.y - model.position.y
 						  ) >
 						  Math.abs(
 								withBoundingBox.find(item => item.uuid === uuid).position.y -
-									model.y
+									model.position.y
 						  )
 						: true;
 				const smallerY =
 					hasY && hadY
 						? Math.abs(
 								withBoundingBox.find(item => item.uuid === previousValue.y.uuid)
-									.position.x - model.x
+									.position.x - model.position.x
 						  ) >
 						  Math.abs(
 								withBoundingBox.find(item => item.uuid === uuid).position.x -
-									model.x
+									model.position.x
 						  )
 						: true;
 				return {
@@ -171,10 +189,10 @@ export const toSiblings = (siblings: Mops.Sibling[]): Mops.SnapHandler => (
 		y: hasSnap.y ? withBoundingBox.find(({uuid}) => uuid === withSnap.y.uuid) : undefined
 	};
 	if (hasSnap.x) {
-		const dir = snaplings.x.position.y > model.y ? -1 : 1;
+		const dir = snaplings.x.position.y > model.position.y ? -1 : 1;
 		const [y1, y2] = [
 			snaplings.x.position.y - (snaplings.x.boundingBox.height / 2) * dir,
-			(hasSnap.y ? snaplings.y.position.y : model.y) + (size.height / 2) * dir
+			(hasSnap.y ? snaplings.y.position.y : model.position.y) + (boundingBox.height / 2) * dir
 		];
 		const guide = {
 			uuid: SIBLING_X,
@@ -193,10 +211,10 @@ export const toSiblings = (siblings: Mops.Sibling[]): Mops.SnapHandler => (
 		removeGuides([SIBLING_X]);
 	}
 	if (hasSnap.y) {
-		const dir = snaplings.y.position.x > model.x ? -1 : 1;
+		const dir = snaplings.y.position.x > model.position.x ? -1 : 1;
 		const [x1, x2] = [
 			snaplings.y.position.x - (snaplings.y.boundingBox.width / 2) * dir,
-			(hasSnap.x ? snaplings.x.position.x : model.x) + (size.width / 2) * dir
+			(hasSnap.x ? snaplings.x.position.x : model.position.x) + (boundingBox.width / 2) * dir
 		];
 		const guide = {
 			uuid: SIBLING_Y,
@@ -214,9 +232,11 @@ export const toSiblings = (siblings: Mops.Sibling[]): Mops.SnapHandler => (
 	} else {
 		removeGuides([SIBLING_Y]);
 	}
-	const snap: Mops.PositionModel = {
-		x: hasSnap.x ? withSnap.x.value : model.x,
-		y: hasSnap.y ? withSnap.y.value : model.y
+	return {
+		...model,
+		position: {
+			x: hasSnap.x ? withSnap.x.value : model.position.x,
+			y: hasSnap.y ? withSnap.y.value : model.position.y
+		}
 	};
-	return snap;
 };

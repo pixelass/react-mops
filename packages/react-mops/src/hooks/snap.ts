@@ -1,6 +1,5 @@
 import React from "react";
 import {Mops} from "../types";
-import {getBoundingBox} from "../utils";
 
 export const useSnap = (
 	shouldSnap: Mops.SnapHandler[],
@@ -9,21 +8,30 @@ export const useSnap = (
 ) =>
 	React.useMemo(
 		() =>
-			shouldSnap
-				? shouldSnap.reduce(
-						(model, fn) => ({
-							...fn(
-								{
-									position,
-									rotation,
-									size: getBoundingBox({...size, angle: rotation.z})
-								},
-								guidesContext,
-								model
-							)
-						}),
-						position
-				  )
-				: position,
+			shouldSnap.reduce(
+				(model, fn) => {
+					const update = fn(
+						{
+							position,
+							rotation,
+							size
+						},
+						guidesContext,
+						model
+					);
+					return {
+						position: {
+							...model.position,
+							...update.position
+						},
+						rotation,
+						size: {
+							...model.size,
+							...update.size
+						}
+					};
+				},
+				{position, rotation, size}
+			),
 		[position, rotation, shouldSnap, size, guidesContext]
 	);

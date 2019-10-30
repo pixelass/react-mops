@@ -150,14 +150,42 @@ export const getBounds = ({
 			? Math.PI - rad
 			: rad
 	);
+	const s = sin(deg);
+	const c = cos(deg);
 	return {
-		height: sin(deg) * width + cos(deg) * height,
-		width: sin(deg) * height + cos(deg) * width
+		height: s * width + c * height,
+		width: s * height + c * width
+	};
+};
+
+export const getInner = ({
+	height,
+	width,
+	angle
+}: {
+	height: number;
+	width: number;
+	angle: number;
+}) => {
+	const s = sin(angle);
+	const c = cos(angle);
+	const p = (1 / (c * c - s * s));
+	return {
+		height: p * (height * c - width * s),
+		width: p * (width * c - height * s)
 	};
 };
 
 export const getBoundingBox = (m: {height: number; width: number; angle: number}) => {
 	const {height, width} = getBounds(m);
+	return {
+		height: Math.abs(height),
+		width: Math.abs(width)
+	};
+};
+
+export const getInnerBox = (m: {height: number; width: number; angle: number}) => {
+	const {height, width} = getInner(m);
 	return {
 		height: Math.abs(height),
 		width: Math.abs(width)

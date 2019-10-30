@@ -1,19 +1,43 @@
 import React from "react";
 
-export const useEventListener = (type, listener, context, dependencies) => {
+type Context = Window | Document | null;
+type UseEventListener = (
+	type: string,
+	listener: EventListener,
+	context: Context,
+	dependencies: any[]
+) => void;
+type UseEventListeners = (
+	type: string[],
+	listener: EventListener,
+	context: Context,
+	dependencies: any[]
+) => void;
+
+export const useEventListener: UseEventListener = (type, listener, context, dependencies) => {
 	React.useEffect(() => {
-		context.addEventListener(type, listener);
+		if (context !== null) {
+			context.addEventListener(type, listener, {passive: true, capture: false});
+		}
 		return () => {
-			context.removeEventListener(type, listener);
+			if (context !== null) {
+				context.removeEventListener(type, listener);
+			}
 		};
 	}, [type, listener, context, ...dependencies]);
 };
 
-export const useEventListeners = (types, listener, context, dependencies) => {
+export const useEventListeners: UseEventListeners = (types, listener, context, dependencies) => {
 	React.useEffect(() => {
-		types.map(type => context.addEventListener(type, listener));
+		if (context !== null) {
+			types.map(type =>
+				context.addEventListener(type, listener, {passive: true, capture: false})
+			);
+		}
 		return () => {
-			types.map(type => context.removeEventListener(type, listener));
+			if (context !== null) {
+				types.map(type => context.removeEventListener(type, listener));
+			}
 		};
 	}, [types, listener, context, ...dependencies]);
 };

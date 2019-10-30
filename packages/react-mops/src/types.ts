@@ -3,17 +3,6 @@ import React from "react";
 // tslint:disable-next-line:no-namespace
 export namespace Mops {
 	/**
-	 * @typedef InitialSizeModel
-	 * @type {object}
-	 * @property {number|string} height
-	 * @property {number|string} width
-	 */
-	export interface InitialSizeModel {
-		height: number | string;
-		width: number | string;
-	}
-
-	/**
 	 * @typedef SizeModel
 	 * @type {object}
 	 * @property {number} height
@@ -49,7 +38,7 @@ export namespace Mops {
 	}
 
 	/**
-	 * @typedef RotationModel
+	 * @typedef BoundingBox
 	 * @type {object}
 	 * @property {PositionModel} position
 	 * @property {RotationModel} rotation
@@ -61,21 +50,10 @@ export namespace Mops {
 		size: SizeModel;
 	}
 
-	/**
-	 * @typedef MouseHandler
-	 * @type {function}
-	 * @param {PositionModel} position
-	 * @param {boolean} altKey
-	 * @param {boolean} shiftKey
-	 * @param {boolean} altKey
-	 */
-	export type MouseHandler = (
-		position: PositionModel,
-		altKey: boolean,
-		shiftKey: boolean,
-		event: MouseEvent
-	) => void;
-
+	export interface SnapModel {
+		position: PositionModel;
+		size: SizeModel;
+	}
 	/**
 	 * @typedef SnapHandler
 	 * @type {function}
@@ -87,8 +65,8 @@ export namespace Mops {
 	export type SnapHandler = (
 		boundingBox: BoundingBox,
 		guideContext: Partial<GuidesContext>,
-		model?: PositionModel
-	) => Partial<PositionModel>;
+		model?: SnapModel
+	) => SnapModel;
 
 	/**
 	 * @typedef EventHandler
@@ -101,54 +79,62 @@ export namespace Mops {
 	/**
 	 * @typedef BoxProps
 	 * @type {object}
-	 * @property {SnapHandler} [shouldSnap]
-	 * @property {React.ComponentType} [marker]
-	 * @property {EventHandler} [onResize]
-	 * @property {EventHandler} [onResizeStart]
-	 * @property {EventHandler} [onResizeEnd]
-	 * @property {EventHandler} [onRotate]
-	 * @property {EventHandler} [onRotateStart]
-	 * @property {EventHandler} [onRotateEnd]
-	 * @property {EventHandler} [onDragStart]
-	 * @property {EventHandler} [onDragEnd]
-	 * @property {PositionModel} [position]
-	 * @property {RotationModel} [rotation]
-	 * @property {SizeModel} [size]
+	 * @property {keyof JSX.IntrinsicElements | React.ComponentType} [as]
+	 * @property {string} [className]
+	 * @property {boolean} [drawBoundingBox]
+	 * @property {boolean} [drawBox]
+	 * @property {boolean} [fullHandles]
 	 * @property {boolean} [isDraggable]
 	 * @property {boolean} [isResizable]
 	 * @property {boolean} [isRotatable]
+	 * @property {React.ComponentType} [marker]
+	 * @property {EventHandler} [onDrag]
+	 * @property {EventHandler} [onDragEnd]
+	 * @property {EventHandler} [onDragStart]
+	 * @property {EventHandler} [onResize]
+	 * @property {EventHandler} [onResizeEnd]
+	 * @property {EventHandler} [onResizeStart]
+	 * @property {EventHandler} [onRotate]
+	 * @property {EventHandler} [onRotateEnd]
+	 * @property {EventHandler} [onRotateStart]
+	 * @property {PositionModel} [position]
+	 * @property {RotationModel} [rotation]
 	 * @property {number} [scale]
-	 * @property {keyof JSX.IntrinsicElements | React.ComponentType} [as]
+	 * @property {SnapHandler} [shouldSnap]
+	 * @property {SizeModel} [size]
 	 */
 	export interface BoxProps {
-		shouldSnap?: SnapHandler[];
-		marker?: React.ComponentType;
-		style?: React.CSSProperties;
+		as?: keyof JSX.IntrinsicElements | React.ComponentType;
 		className?: string;
-		ref?: React.Ref<HTMLElement>;
-		onResize?: EventHandler;
-		onResizeStart?: EventHandler;
-		onResizeEnd?: EventHandler;
-		onRotate?: EventHandler;
-		onRotateStart?: EventHandler;
-		onRotateEnd?: EventHandler;
-		onDrag?: EventHandler;
-		onDragStart?: EventHandler;
-		onDragEnd?: EventHandler;
-		position?: PositionModel;
-		rotation?: RotationModel;
-		size?: InitialSizeModel;
-		fullHandles?: boolean;
-		drawBox?: boolean;
-		minHeight?: number;
-		minWidth?: number;
 		drawBoundingBox?: boolean;
+		drawBox?: boolean;
+		fullHandles?: boolean;
 		isDraggable?: boolean;
 		isResizable?: boolean;
 		isRotatable?: boolean;
+		marker?: React.ComponentType;
+		onDrag?: EventHandler;
+		onDragEnd?: EventHandler;
+		onDragStart?: EventHandler;
+		onResize?: EventHandler;
+		onResizeEnd?: EventHandler;
+		onResizeStart?: EventHandler;
+		onRotate?: EventHandler;
+		onRotateEnd?: EventHandler;
+		onRotateStart?: EventHandler;
+		position?: PositionModel;
+		ref?: React.Ref<HTMLElement>;
+		rotation?: RotationModel;
 		scale?: number;
-		as?: keyof JSX.IntrinsicElements | React.ComponentType;
+		shouldSnap?: SnapHandler[];
+		size?: SizeModel;
+		style?: React.CSSProperties;
 	}
+	export interface Dir {
+		y: -1 | 1 | 0;
+		x: -1 | 1 | 0;
+	}
+
 	export enum HandleVariations {
 		e,
 		se,
@@ -160,19 +146,39 @@ export namespace Mops {
 		ne
 	}
 	export type HandleVariation = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
-	export interface HandleProps extends React.HTMLAttributes<HTMLAnchorElement> {
-		variation: Mops.HandleVariation;
-		isResizable?: boolean;
-		isRotatable?: boolean;
-		isMouseDown?: boolean;
-		metaKey?: boolean;
-		ref?: React.Ref<HTMLAnchorElement>;
-		marker?: React.ComponentType<{style?: React.CSSProperties}>;
+	export type HandleDirs = {
+		[key in HandleVariation]: Dir;
+	};
+	export interface HandleProps extends React.HTMLAttributes<HTMLSpanElement> {
+		ref?: React.Ref<HTMLSpanElement>;
+		marker: React.ComponentType | null;
+		fullSize?: boolean;
+		variation: HandleVariation;
+	}
+
+	export interface AxisProps extends React.HTMLAttributes<HTMLDivElement> {
+		ref?: React.Ref<HTMLDivElement>;
+	}
+	export interface GuidesInnerProps extends React.HTMLAttributes<HTMLDivElement> {
+		ref?: React.Ref<HTMLDivElement>;
+	}
+	export interface GuidesWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
+		ref?: React.Ref<HTMLDivElement>;
+	}
+
+	export interface BoundingBoxProps extends React.HTMLAttributes<HTMLDivElement> {
+		drawOutline?: boolean;
+		ref?: React.Ref<HTMLDivElement>;
+	}
+
+	export interface HandlesProps extends React.HTMLAttributes<HTMLDivElement> {
+		drawOutline?: boolean;
+		ref?: React.Ref<HTMLDivElement>;
 	}
 
 	export interface WrapperProps extends React.HTMLAttributes<HTMLElement> {
+		as?: keyof JSX.IntrinsicElements | React.ComponentType<unknown>;
 		isDown?: boolean;
-		as?: keyof JSX.IntrinsicElements | React.ComponentType<any>;
 		ref?: React.Ref<HTMLElement>;
 	}
 
@@ -180,46 +186,16 @@ export namespace Mops {
 		ref?: React.Ref<HTMLDivElement>;
 	}
 
-	export interface ProviderProps {
-		isResizable?: boolean;
-		isRotatable?: boolean;
-		isDraggable?: boolean;
-		getCursorSlice?: (n: number) => number;
-		handleRotationDown?: (e: React.MouseEvent) => void;
-		metaKey?: boolean;
-	}
-
-	export interface UseHandleProps {
-		setSize: (s: Mops.SizeModel | ((state: Mops.SizeModel) => Mops.SizeModel)) => void;
-		setInitialSize: (s: Mops.SizeModel | ((state: Mops.SizeModel) => Mops.SizeModel)) => void;
-		setPosition: (
-			p: Mops.PositionModel | ((state: Mops.PositionModel) => Mops.PositionModel)
-		) => void;
-		setInitialPosition: (
-			p: Mops.PositionModel | ((state: Mops.PositionModel) => Mops.PositionModel)
-		) => void;
-		handleSize: (
-			p: Mops.PositionModel,
-			altKey: boolean,
-			shiftKey: boolean
-		) => (s: Mops.SizeModel) => Mops.SizeModel;
-		handlePosition: (
-			p: Mops.PositionModel,
-			altKey: boolean,
-			shiftKey: boolean
-		) => (p: Mops.PositionModel) => Mops.PositionModel;
-		scale: number;
-		rotation?: Mops.RotationModel;
-		contentRef?: React.RefObject<HTMLElement>;
-	}
-
 	export interface GuideProps {
+		guideColor?: string;
+		height: number;
 		showGuides?: boolean;
+		width: number;
 	}
 
 	export interface Guide {
-		visible?: boolean;
 		uuid: string;
+		visible?: boolean;
 		x1: number;
 		x2: number;
 		y1: number;
@@ -250,4 +226,33 @@ export namespace Mops {
 	export interface Sibling extends Partial<BoundingBox> {
 		uuid: string;
 	}
+
+	export type SetPosition = React.Dispatch<React.SetStateAction<PositionModel>>;
+	export type SetSize = React.Dispatch<React.SetStateAction<SizeModel>>;
+
+	export interface UseSizeProps {
+		dir?: Dir;
+		minHeight?: number;
+		minWidth?: number;
+		centered?: boolean;
+		deg?: number;
+		initialPosition?: PositionModel;
+		onResizeEnd?: (boundingBox: Partial<BoundingBox>) => void;
+		onResizeStart?: (boundingBox: Partial<BoundingBox>) => void;
+		onResize?: (boundingBox: Partial<BoundingBox>) => void;
+		setPosition?: SetPosition;
+		setInitialPosition?: SetPosition;
+	}
+	export type UseSize = (
+		initialState: SizeModel,
+		props: UseSizeProps
+	) => [
+		SizeModel,
+		{
+			onMouseDown?: React.MouseEventHandler;
+			onTouchStart?: React.TouchEventHandler;
+			setSize?: SetSize;
+			setInitialSize?: SetSize;
+		}
+	];
 }

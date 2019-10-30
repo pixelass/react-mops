@@ -18,24 +18,24 @@ export const useOffset = ({onDragStart, onDrag, onDragEnd}, initialState = {x: 0
 	);
 	const onMouseMove = React.useCallback(
 		(event: MouseEvent) => {
-			event.preventDefault();
 			handleMove({x: event.clientX, y: event.clientY});
 		},
 		[handleMove]
 	);
 	const onTouchMove = React.useCallback(
 		(event: TouchEvent) => {
-			event.preventDefault();
 			handleMove({x: event.touches[0].clientX, y: event.touches[0].clientY});
 		},
 		[handleMove]
 	);
 	const handleUp = React.useCallback(
 		(pointer?: Mops.PositionModel) => {
-			const coords = pointer ? {
-				x: pointer.x - initialOffset.x,
-				y: pointer.y - initialOffset.y
-			} : offset;
+			const coords = pointer
+				? {
+						x: pointer.x - initialOffset.x,
+						y: pointer.y - initialOffset.y
+				  }
+				: offset;
 			setOffset(coords);
 			onDragEnd(coords);
 		},

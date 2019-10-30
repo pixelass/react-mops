@@ -1,5 +1,6 @@
 import update from "immutability-helper";
 import React from "react";
+import {GuidesInner, GuidesWrapper} from "../elements";
 import {Mops} from "../types";
 
 const {Provider, Consumer} = React.createContext<Mops.GuidesContext>({
@@ -24,78 +25,93 @@ export const GuidesProvider: React.FunctionComponent<{
 	containerSize: Mops.ContainerSize;
 }> = ({children, guideRequests, containerSize}) => {
 	const [guides, setGuides] = React.useState<Mops.Guide[]>([]);
-	const addGuides = React.useCallback(guideModels => {
-		setGuides(state => {
-			const newGuides = guideModels.filter(
-				({uuid}) =>
-					!Boolean(
-						state.find(guide => {
-							return guide.uuid === uuid;
-						})
-					)
-			);
-			return update(state, {
-				$push: newGuides
-			});
-		});
-	}, [setGuides]);
-	const removeGuides = React.useCallback(uuids => {
-		setGuides(state => {
-			return uuids
-				? update(state, {
-						$splice: uuids
-							.map(uuid => {
-								const index = state.findIndex(guide => guide.uuid === uuid);
-								if (index >= 0) {
-									return [index, 1];
-								}
-								return false;
+	const addGuides = React.useCallback(
+		guideModels => {
+			setGuides(state => {
+				const newGuides = guideModels.filter(
+					({uuid}) =>
+						!Boolean(
+							state.find(guide => {
+								return guide.uuid === uuid;
 							})
-							.filter(Boolean)
-							.sort(([a], [b]) => b - a)
-				  })
-				: [];
-		});
-	}, [setGuides]);
-	const showGuides = React.useCallback(uuids => {
-		setGuides(state =>
-			update(
-				state,
-				(uuids || state.map(({uuid}) => uuid)).reduce((previousValue, currentValue) => {
-					const index = state.findIndex(({uuid}) => uuid === currentValue);
-					return index > -1
-						? {...previousValue, [index]: {visible: {$set: true}}}
-						: previousValue;
-				}, {})
-			)
-		);
-	}, [setGuides]);
-	const hideGuides = React.useCallback(uuids => {
-		setGuides(state =>
-			update(
-				state,
-				(uuids || state.map(({uuid}) => uuid)).reduce((previousValue, currentValue) => {
-					const index = state.findIndex(({uuid}) => uuid === currentValue);
-					return index > -1
-						? {...previousValue, [index]: {visible: {$set: false}}}
-						: previousValue;
-				}, {})
-			)
-		);
-	}, [setGuides]);
+						)
+				);
+				return update(state, {
+					$push: newGuides
+				});
+			});
+		},
+		[setGuides]
+	);
+	const removeGuides = React.useCallback(
+		uuids => {
+			setGuides(state => {
+				return uuids
+					? update(state, {
+							$splice: uuids
+								.map(uuid => {
+									const index = state.findIndex(guide => guide.uuid === uuid);
+									if (index >= 0) {
+										return [index, 1];
+									}
+									return false;
+								})
+								.filter(Boolean)
+								.sort(([a], [b]) => b - a)
+					  })
+					: [];
+			});
+		},
+		[setGuides]
+	);
+	const showGuides = React.useCallback(
+		uuids => {
+			setGuides(state =>
+				update(
+					state,
+					(uuids || state.map(({uuid}) => uuid)).reduce((previousValue, currentValue) => {
+						const index = state.findIndex(({uuid}) => uuid === currentValue);
+						return index > -1
+							? {...previousValue, [index]: {visible: {$set: true}}}
+							: previousValue;
+					}, {})
+				)
+			);
+		},
+		[setGuides]
+	);
+	const hideGuides = React.useCallback(
+		uuids => {
+			setGuides(state =>
+				update(
+					state,
+					(uuids || state.map(({uuid}) => uuid)).reduce((previousValue, currentValue) => {
+						const index = state.findIndex(({uuid}) => uuid === currentValue);
+						return index > -1
+							? {...previousValue, [index]: {visible: {$set: false}}}
+							: previousValue;
+					}, {})
+				)
+			);
+		},
+		[setGuides]
+	);
 
-	const updateGuide = React.useCallback(partialItem => {
-		setGuides(state => {
-			const index = state.findIndex(({uuid}) => uuid === partialItem.uuid);
-			return index > -1
-				? update(state, {
-						[index]: {
-							$merge: partialItem
-						}
-				  })
-				: state;
-		});
-	}, [setGuides]);
+	const updateGuide = React.useCallback(
+		partialItem => {
+			setGuides(state => {
+				const index = state.findIndex(({uuid}) => uuid === partialItem.uuid);
+				return index > -1
+					? update(state, {
+							[index]: {
+								$merge: partialItem
+							}
+					  })
+					: state;
+			});
+		},
+		[setGuides]
+	);
 	React.useEffect(() => {
 		if (guideRequests) {
 			const guideModels = guideRequests.map(({uuid, x, y}) => {
@@ -144,61 +160,36 @@ export const GuidesProvider: React.FunctionComponent<{
 export const Guides: React.RefForwardingComponent<
 	HTMLDivElement,
 	Mops.GuideProps
-> = React.forwardRef(({...props}, ref: React.Ref<HTMLDivElement>) => {
-	const sizeRef = React.useRef<HTMLDivElement>();
+> = React.forwardRef(
+	({guideColor, showGuides, height, width, ...props}, ref: React.Ref<HTMLDivElement>) => {
+		const sizeRef = React.useRef<HTMLDivElement>();
+		return (
+			<GuidesWrapper ref={ref}>
+				<Consumer>
+					{({guides}) => {
+						return (
+							<GuidesInner ref={sizeRef}>
+								<svg viewBox={`0 0 ${width} ${height}`}>
+									{guides
+										.filter(({visible}) => visible || showGuides)
+										.map(({uuid, visible, ...guide}) => (
+											<line
+												{...guide}
+												key={uuid}
+												stroke={guideColor}
+												strokeWidth={2}
+											/>
+										))}
+								</svg>
+							</GuidesInner>
+						);
+					}}
+				</Consumer>
+			</GuidesWrapper>
+		);
+	}
+);
 
-	const [height, setHeight] = React.useState(0);
-	const [width, setWidth] = React.useState(0);
-
-	const viewBox = `0 0 ${width} ${height}`;
-
-	React.useEffect(() => {
-		if (sizeRef && sizeRef.current) {
-			const {clientHeight, clientWidth} = sizeRef.current as HTMLDivElement;
-			setHeight(clientHeight);
-			setWidth(clientWidth);
-		}
-	}, [ref, setHeight, setWidth]);
-	return (
-		<div
-			ref={ref}
-			style={{
-				bottom: 0,
-				left: 0,
-				pointerEvents: "none",
-				position: "absolute",
-				right: 0,
-				top: 0,
-				zIndex: 3
-			}}>
-			<Consumer>
-				{({guides}) => {
-					return (
-						<div
-							ref={sizeRef}
-							style={{
-								bottom: 0,
-								left: 0,
-								position: "absolute",
-								right: 0,
-								top: 0
-							}}>
-							<svg viewBox={viewBox}>
-								{guides
-									.filter(({visible}) => visible)
-									.map(({uuid, visible, ...guide}) => (
-										<line
-											{...guide}
-											key={uuid}
-											stroke="hsl(50, 100%, 50%)"
-											strokeWidth={2}
-										/>
-									))}
-							</svg>
-						</div>
-					);
-				}}
-			</Consumer>
-		</div>
-	);
-});
+Guides.defaultProps = {
+	guideColor: "hsl(50, 100%, 50%)"
+};

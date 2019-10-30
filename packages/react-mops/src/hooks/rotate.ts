@@ -14,7 +14,7 @@ interface Props {
 
 export const useRotate = (
 	initialState: number = 0,
-	{ steps, step = 15, onRotateEnd, onRotate, onRotateStart}: Props
+	{steps, step = 15, onRotateEnd, onRotate, onRotateStart}: Props
 ) => {
 	const ref = React.useRef();
 	const [initialAngle, setInitialAngle] = React.useState(initialState);
