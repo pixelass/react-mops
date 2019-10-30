@@ -1,8 +1,8 @@
 import {v4 as uuidV4} from "uuid";
 
 export const containerSize = {
-	height: 300,
-	width: 300
+	height: 900,
+	width: 1600
 };
 export const gridSize = {x: 25, y: 25};
 export const fixedGuides = [

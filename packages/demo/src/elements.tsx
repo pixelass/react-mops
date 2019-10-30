@@ -8,7 +8,6 @@ export const Wrapper = styled.div`
 	padding: 10px;
 	border-radius: 2px;
 	box-shadow: 0 0 0 1px hsla(0, 0%, 0%, 0.5);
-	width: ${containerSize.width + 40}px;
 `;
 export const Examples = styled.div`
 	position: relative;
@@ -17,7 +16,7 @@ export const Examples = styled.div`
 `;
 export const Example = styled.div`
 	position: relative;
-	margin: auto;
+	margin: auto auto 10rem;
 `;
 export const Headline = styled.h2`
 	margin: 0;
@@ -68,11 +67,7 @@ export const Container = styled.div<{withGrid?: {x: number; y: number}; hasBound
 						var(--line-color) var(--line-width),
 						transparent var(--line-width)
 					),
-					linear-gradient(
-						90deg,
-						var(--line-color) var(--line-width),
-						transparent var(--line-width)
-					);
+					linear-gradient(90deg, var(--line-color) var(--line-width), transparent var(--line-width));
 				background-repeat: repeat;
 				background-position: calc(var(--line-width) / -2) calc(var(--line-width) / 2);
 				background-size: ${withGrid.x}px ${withGrid.y}px;
@@ -93,13 +88,12 @@ export const Inner = styled.div`
 `;
 export const StyledMarker = styled.span`
 	position: absolute;
-	top: 50%;
-	left: 50%;
-	height: 80%;
-	width: 80%;
-	transform: translate(-50%, -50%);
-	border: 3px solid white;
-	background: hsl(180, 100%, 20%);
+	top: 7px;
+	right: 7px;
+	bottom: 7px;
+	left: 7px;
+	border: 1px solid black;
+	background: white;
 	pointer-events: none;
 `;
 export const InvisibleMarker = styled.span`
@@ -153,6 +147,9 @@ export const ButtonWrapper = styled.div`
 		}
 		&:last-child {
 			border-radius: 0 3px 3px 0;
+		}
+		&:only-child {
+			border-radius: 3px;
 		}
 	}
 `;

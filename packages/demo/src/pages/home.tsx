@@ -8,11 +8,12 @@ import {
 	toBounds,
 	toGrid,
 	toGuides,
-	toSiblings
+	toSiblings,
+	useViewport
 } from "react-mops";
 import {ThemeProvider} from "styled-components";
 import {v4 as uuidV4} from "uuid";
-import {containerSize, fixedGuides, gridSize} from "../constants";
+import {containerSize as initialContainerSize, fixedGuides as initialFixedGuides, gridSize} from "../constants";
 import {
 	Button,
 	ButtonWrapper,
@@ -21,6 +22,8 @@ import {
 	Examples,
 	Headline,
 	Inner,
+	StyledBox,
+	StyledMarker,
 	SubHeadline,
 	Title,
 	Wrapper
@@ -31,13 +34,40 @@ export function Home() {
 	const [isDraggable, setDraggable] = React.useState(true);
 	const [isResizable, setResizable] = React.useState(true);
 	const [isRotatable, setRotatable] = React.useState(true);
-	const [showMarkers, setMarkers] = React.useState(true);
+	const [showMarkers, setMarkers] = React.useState(false);
 	const [showBox, setBox] = React.useState(false);
 	const [showBoundingBox, setBoundingBox] = React.useState(false);
+	const [fullHandles, setFullHandles] = React.useState(true);
 	const [hasGrid, setGrid] = React.useState(false);
 	const [hasBounds, setBounds] = React.useState(false);
-	const [hasGuides, setGuides] = React.useState(true);
-	const [hasSiblings, setSiblings] = React.useState(true);
+	const [hasGuides, setGuides] = React.useState(false);
+	const [hasSiblings, setSiblings] = React.useState(false);
+	const [containerSize, setContainerSize] = React.useState<Mops.SizeModel>(initialContainerSize);
+	const [fixedGuides, setFixedGuides] = React.useState(initialFixedGuides);
+	const [guideColor, setGuideColor] = React.useState("#ff00ff");
+
+	const viewportSize = useViewport({
+		fallbackSize: initialContainerSize
+	});
+
+	React.useEffect(() => {
+		const newSize = {
+			height: Math.min(initialContainerSize.height, viewportSize.height),
+			width: Math.min(initialContainerSize.width, viewportSize.width)
+		};
+		const newContainerSize = {
+			height: newSize.height - 100,
+			width: newSize.width - 40
+		};
+		const newGuides = [
+			{x: newContainerSize.width / 4},
+			{x: (newContainerSize.width / 4) * 3},
+			{x: newContainerSize.width / 2},
+			{y: newContainerSize.height / 2}
+		];
+		setContainerSize(newContainerSize);
+		setFixedGuides(state => state.map(({uuid}, i) => ({uuid, ...newGuides[i]})));
+	}, [setContainerSize, setFixedGuides, viewportSize]);
 
 	const updateItem = (item: Mops.Sibling) =>
 		setItems(state => {
@@ -51,12 +81,12 @@ export function Home() {
 		});
 
 	const addItem = () => {
-		const height = Math.round(Math.random() * 200) + 100;
-		const width = Math.round(Math.random() * 200) + 100;
+		const height = Math.round(Math.random() * 5) * gridSize.y + gridSize.y * 2;
+		const width = Math.round(Math.random() * 5) * gridSize.x + gridSize.x * 2;
 		setItems(state => [
 			...state,
 			{
-				backgroundColor: `hsl(${Math.round(Math.random() * 360)}, 100%, 50%)`,
+				backgroundColor: `hsla(${Math.round(Math.random() * 360)}, 100%, 50%, 0.2)`,
 				position: {
 					x: width / 2,
 					y: height / 2
@@ -77,25 +107,16 @@ export function Home() {
 
 	const shouldSnap: Mops.SnapHandler[] = React.useMemo(
 		() => [
-			hasGrid ? toGrid(gridSize) : undefined,
-			hasGuides
-				? toGuides({
-						threshold: {
-							x: gridSize.x / 2,
-							y: gridSize.y / 2
-						}
-				  })
-				: undefined,
-			hasBounds
-				? toBounds({
-						bottom: containerSize.height,
-						left: 0,
-						right: containerSize.width,
-						top: 0
-				  })
-				: undefined
+			hasGrid && toGrid(gridSize),
+			hasGuides &&
+				toGuides({
+					threshold: {
+						x: gridSize.x / 2,
+						y: gridSize.y / 2
+					}
+				})
 		],
-		[hasBounds, hasGrid, hasGuides, isDraggable, isResizable, isRotatable]
+		[hasGrid, hasGuides]
 	);
 	React.useEffect(() => {
 		addItem();
@@ -109,12 +130,11 @@ export function Home() {
 					<Headline>Orientation</Headline>
 					<ul>
 						<li>
-							Press <code>Cmd / Ctrl)</code> to enable rotation. (OS X / Windows,
-							Linux)
+							Press <code>(Cmd ⌘ / Ctrl)</code> to enable rotation. (OS X / Windows, Linux)
 						</li>
 						<li>Hold and drag a handle.</li>
 						<li>
-							Press <code>Shift</code> to rotate in steps of 15°.
+							Press <code>Shift ⇧</code> to rotate in steps of 15°.
 						</li>
 					</ul>
 					<Headline>Position</Headline>
@@ -125,14 +145,14 @@ export function Home() {
 					<ul>
 						<li>Hold and drag a handle.</li>
 						<li>
-							Press <code>Alt</code> to resize opposite sides.
+							Press <code>Option / Alt ⌥</code> to resize proportionally from the center.
 						</li>
 						<li>
-							Press <code>Shift</code> to retain the aspect-ratio.
+							Press <code>Shift ⇧</code> to retain the aspect-ratio.
 						</li>
 					</ul>
 					<hr />
-					<SubHeadline>Snapping (onDrag)</SubHeadline>
+					<SubHeadline>Snapping</SubHeadline>
 					<ButtonWrapper>
 						<Button
 							onClick={() => {
@@ -187,6 +207,20 @@ export function Home() {
 							Rotatable
 						</Button>
 					</ButtonWrapper>
+					<SubHeadline>Options</SubHeadline>
+					<label>
+						<span>Guide color: </span>
+						<input type="color" value={guideColor} onChange={e => setGuideColor(e.target.value)} />
+					</label>
+					<ButtonWrapper>
+						<Button
+							onClick={() => {
+								setFullHandles(state => !state);
+							}}
+							isActive={fullHandles}>
+							Full Handles
+						</Button>
+					</ButtonWrapper>
 					<SubHeadline>Debug</SubHeadline>
 					<ButtonWrapper>
 						<Button
@@ -216,21 +250,23 @@ export function Home() {
 				</Wrapper>
 
 				<Examples>
-					<GuidesProvider
-						guideRequests={hasGuides ? fixedGuides : undefined}
-						containerSize={containerSize}>
+					<GuidesProvider guideRequests={hasGuides ? fixedGuides : undefined} containerSize={containerSize}>
 						<Example>
 							<Container
+								style={{
+									...containerSize
+								}}
 								withGrid={hasGrid ? gridSize : undefined}
 								hasBounds={hasBounds}>
-								<Guides />
+								<Guides guideColor={guideColor} {...containerSize} />
 
 								{items.map(({uuid, size, position, rotation, backgroundColor}) => (
 									<Box
 										key={uuid}
-										// as={StyledBox}
-										// drawBoundingBox={showBoundingBox}
-										// drawBox={showBox}
+										as={StyledBox}
+										drawBoundingBox={showBoundingBox}
+										drawBox={showBox}
+										fullHandles={fullHandles}
 										isDraggable={isDraggable}
 										isResizable={isResizable}
 										isRotatable={isRotatable}
@@ -273,17 +309,21 @@ export function Home() {
 											console.log("resize:end");
 											updateItem({uuid, rotation, position, size, ...b});
 										}}
-										// minHeight={100} // not implemented
-										// minWidth={100} // not implemented
-										// marker={showMarkers ? undefined : InvisibleMarker}
-										// fullHandles={!showMarkers}
+										marker={showMarkers ? StyledMarker : null}
 										size={size}
 										position={position}
 										rotation={rotation}
 										shouldSnap={[
 											...shouldSnap,
 											hasSiblings &&
-												toSiblings(items.filter(item => item.uuid !== uuid))
+												toSiblings(items.filter(item => item.uuid !== uuid), gridSize),
+											hasBounds &&
+												toBounds({
+													bottom: containerSize.height,
+													left: 0,
+													right: containerSize.width,
+													top: 0
+												})
 										].filter(Boolean)}>
 										<Inner style={{backgroundColor}} />
 									</Box>
