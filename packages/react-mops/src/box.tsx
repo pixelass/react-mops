@@ -138,7 +138,6 @@ const Box: React.FunctionComponent<Mops.BoxProps & Mops.GuidesContext> = ({
 	);
 
 	const boundingBox = useBoundingBox(snap.size, rotate);
-	console.log(guides)
 
 	return (
 		<Wrapper
