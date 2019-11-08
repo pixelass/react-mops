@@ -38,18 +38,22 @@ export const coordinatesToDeg = (
 };
 
 export const normalize = n => {
-	const rounded = Math.round(n * 10000) / 10000;
+	const rounded = Math.round(n * 1000000000) / 1000000000;
 	if (rounded === 0 || rounded === -0) {
 		return 0;
 	}
-	return rounded;
+	return n;
 };
 
-export const polarToCartesian = (deg: number, radius: number = 1): Mops.PositionModel => {
-	const y = sin(deg) * radius;
-	const x = cos(deg) * radius;
-	return {x, y};
-};
+export const polarToCartesian = (deg: number, radius: number = 1): Mops.PositionModel => ({
+	x: cos(deg) * radius,
+	y: sin(deg) * radius
+});
+
+export const cartesianToPolar = ({x, y}: Mops.PositionModel) => ({
+	deg: to360(atan2(y, x)),
+	radius: getHypotenuse(y, x)
+});
 
 /**
  * Convert degrees to radians
@@ -146,9 +150,29 @@ export const getBounds = ({
 			? Math.PI - rad
 			: rad
 	);
+	const s = sin(deg);
+	const c = cos(deg);
 	return {
-		height: sin(deg) * width + cos(deg) * height,
-		width: sin(deg) * height + cos(deg) * width
+		height: s * width + c * height,
+		width: s * height + c * width
+	};
+};
+
+export const getInner = ({
+	height,
+	width,
+	angle
+}: {
+	height: number;
+	width: number;
+	angle: number;
+}) => {
+	const s = sin(angle);
+	const c = cos(angle);
+	const p = (1 / (c * c - s * s));
+	return {
+		height: p * (height * c - width * s),
+		width: p * (width * c - height * s)
 	};
 };
 
@@ -160,8 +184,18 @@ export const getBoundingBox = (m: {height: number; width: number; angle: number}
 	};
 };
 
+export const getInnerBox = (m: {height: number; width: number; angle: number}) => {
+	const {height, width} = getInner(m);
+	return {
+		height: Math.abs(height),
+		width: Math.abs(width)
+	};
+};
+
 export const inRange = (value: number, min: number, max: number) => value >= min && value <= max;
 
 const fallback = (...n: number[]) => n[0];
 export const chooseFn = (a: number, b: number = 0): ((...values: number[]) => number) =>
 	a > b ? Math.min : b > a ? Math.max : fallback;
+
+export const steps = (value: number, step: number) => Math.round(value / step) * step;

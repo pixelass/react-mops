@@ -1,343 +1,219 @@
 import React from "react";
-import {BoundingBox, Content, Handle, Handles, PropProvider, Wrapper} from "./elements";
 import {
-	listenRR,
-	useCursorSlice,
-	useDown,
-	useDrag,
-	useHandleMouse,
-	useHandleMouseEvent,
-	useHandlers,
-	useHandles,
-	useHandlesDown,
-	useInitialSize,
-	useLoaded,
+	Axis,
+	BoundingBox,
+	Content,
+	Handle,
+	handleDirs,
+	Handles,
+	handleVariations,
+	Wrapper
+} from "./elements";
+import {GuidesConsumer} from "./guides";
+import {
+	useAlt,
+	useBoundingBox,
+	useControl,
 	useMeta,
-	useWithCornerHandle,
-	useWithDown,
-	useWithHandle
+	usePosition,
+	useRotate,
+	useShift,
+	useSize,
+	useSnap
 } from "./hooks";
+import {isOSX} from "./os";
 import {Mops} from "./types";
-import {getBoundingBox} from "./utils";
 
-export const Box: React.RefForwardingComponent<
-	HTMLElement,
-	Mops.BoxProps & Mops.GuidesContext
-> = React.forwardRef(
-	(
-		{
-			as,
-			children,
-			className,
-			drawBoundingBox,
-			drawBox,
-			isResizable,
-			isRotatable,
-			isDraggable,
-			fullHandles,
-			marker,
-			minHeight,
-			minWidth,
-			onDrag,
-			onDragStart,
-			onDragEnd,
-			onResize,
-			onResizeStart,
-			onResizeEnd,
-			onRotate,
-			onRotateStart,
-			onRotateEnd,
-			position,
-			rotation,
-			scale,
-			showGuides,
-			hideGuides,
-			updateGuide,
-			addGuides,
-			removeGuides,
-			guides,
-			guideRequests,
-			shouldSnap,
-			size,
-			style,
-			...props
+const Box: React.FunctionComponent<Mops.BoxProps & Mops.GuidesContext> = ({
+	as,
+	children,
+	drawBoundingBox,
+	drawBox,
+	fullHandles,
+	size: initialSize,
+	position: initialPosition,
+	rotation: initialRotation,
+	onRotateEnd,
+	onDragEnd,
+	onResizeEnd,
+	onRotateStart,
+	onDragStart,
+	onResizeStart,
+	onRotate,
+	onDrag,
+	onResize,
+	isResizable,
+	isDraggable,
+	marker,
+	isRotatable,
+	shouldSnap = [],
+	addGuides,
+	guideRequests,
+	guides,
+	hideGuides,
+	removeGuides,
+	showGuides,
+	updateGuide
+}) => {
+	const [isActive, setActive] = React.useState<boolean>(false);
+	const [dir, setDir] = React.useState<Mops.Dir>({x: 0, y: 0});
+	const metaKey = useMeta();
+	const controlKey = useControl();
+	const altKey = useAlt();
+	const shiftKey = useShift();
+	const [rotate, rotateProps] = useRotate(initialRotation.z, {
+		onRotate,
+		onRotateEnd: b => {
+			const update = onEnd();
+			if (onRotateEnd) {
+				onRotateEnd({...b, ...update});
+			}
 		},
-		ref
-	) => {
-		const contentRef = React.useRef<HTMLDivElement>();
-		const [loaded, setLoaded] = React.useState(false);
-		const [initialSize, setInitialSize] = React.useState<Mops.SizeModel>(
-			size as Mops.SizeModel
-		);
-		const [currentSize, setSize] = React.useState<Mops.SizeModel>(initialSize);
-		const [initialPosition, setInitialPosition] = React.useState<Mops.PositionModel>(position);
-		const [currentPosition, setPosition] = React.useState<Mops.PositionModel>(initialPosition);
-		const [initialRotation, setInitialRotation] = React.useState<Mops.RotationModel>(rotation);
-		const [currentRotation, setRotation] = React.useState<Mops.RotationModel>(initialRotation);
-		const [additionalAngle, setAdditionalAngle] = React.useState<Mops.RotationModel>(rotation);
-		const metaKey = useMeta();
-		const {
-			handleDrag,
-			handleDragEnd,
-			handleDragStart,
-			handleResize,
-			handleResizeEnd,
-			handleResizeStart,
-			handleRotate,
-			handleRotateEnd,
-			handleRotateStart
-		} = useHandlers({
-			currentPosition,
-			currentRotation,
-			currentSize,
-			onDrag,
-			onDragEnd,
-			onDragStart,
-			onResize,
-			onResizeEnd,
-			onResizeStart,
-			onRotate,
-			onRotateEnd,
-			onRotateStart
-		});
-		const withHandle = useWithHandle({
-			contentRef,
-			currentPosition,
-			currentRotation,
-			initialPosition,
-			initialSize,
-			isResizable,
-			minHeight,
-			minWidth,
-			scale,
-			setInitialPosition,
-			setInitialSize,
-			setPosition,
-			setSize
-		});
+		onRotateStart: b => {
+			if (onRotateStart) {
+				onRotateStart(b);
+			}
+		},
+		step: 15,
+		steps: shiftKey
+	});
+	const [position, positionProps] = usePosition(initialPosition, {
+		onDrag,
+		onDragEnd: o => {
+			setActive(false);
+			const update = onEnd();
+			if (onDragEnd) {
+				onDragEnd({...o, ...update});
+			}
+		},
+		onDragStart: b => {
+			setActive(true);
+			if (onDragStart) {
+				onDragStart(b);
+			}
+		}
+	});
+	const [size, sizeProps] = useSize(initialSize, {
+		centered: altKey,
+		deg: rotate,
+		dir,
+		initialPosition: positionProps.initialPosition,
+		onResize,
+		onResizeEnd: b => {
+			const update = onEnd();
+			if (onResizeEnd) {
+				onResizeEnd({...b, ...update});
+			}
+		},
+		onResizeStart: b => {
+			if (onResizeStart) {
+				onResizeStart(b);
+			}
+		},
+		setInitialPosition: positionProps.setInitialPosition,
+		setPosition: positionProps.setPosition
+	});
 
-		// const getLimit = React.useCallback(
-		// 	(radius, angle) => {
-		// 		const {x, y} = polarToCartesian(angle + initialRotation.z);
-		// 		return {
-		// 			x: (n: number) => chooseFn(x)(initialPosition.x + x * radius, n),
-		// 			y: (n: number) => chooseFn(y)( initialPosition.y + y * radius, n)
-		// 		};
-		// 	},
-		// 	[initialPosition, initialRotation]
-		// );
-		// const diff = React.useMemo(
-		// 	() => ({
-		// 		x: (initialSize.width - minWidth) / 2,
-		// 		y: (initialSize.height - minHeight) / 2
-		// 	}),
-		// 	[initialSize, minHeight, minWidth]
-		// );
-		// const limitLeft = React.useMemo(() => getLimit(diff.x, 0), [diff, getLimit]);
-		// const limitTop = React.useMemo(() => getLimit(diff.y, 90), [diff, getLimit]);
-		// const limitRight = React.useMemo(() => getLimit(diff.x, 180), [diff, getLimit]);
-		// const limitBottom = React.useMemo(() => getLimit(diff.y, 270), [diff, getLimit]);
-		// const limitTopLeft = React.useMemo(() => {
-		// 	const distance = getHypotenuse(diff.y, diff.x);
-		// 	const angle = atan2(diff.y, diff.x);
-		// 	return getLimit(distance, angle);
-		// }, [diff, getLimit]);
+	const snap = useSnap(
+		isActive ? shouldSnap : [],
+		{size, position, rotation: {...initialRotation, z: rotate}},
+		{addGuides, guideRequests, guides, hideGuides, removeGuides, showGuides, updateGuide}
+	);
 
-		const withCornerHandle = useWithCornerHandle({
-			currentRotation,
-			initialPosition,
-			initialSize,
-			withHandle
-		});
+	const onEnd = React.useCallback(
+		() => {
+			const newPosition = snap.position as Mops.PositionModel;
+			const newSize = snap.size as Mops.SizeModel;
+			positionProps.setPosition(newPosition);
+			positionProps.setInitialPosition(newPosition);
+			sizeProps.setSize(newSize);
+			sizeProps.setInitialSize(newSize);
+			hideGuides();
+			return {
+				position: newPosition,
+				size: newSize
+			};
+		},
+		[hideGuides, sizeProps, positionProps]
+	);
 
-		const {
-			isBottomDown,
-			isBottomLeftDown,
-			isBottomRightDown,
-			isLeftDown,
-			isRightDown,
-			isTopDown,
-			isTopLeftDown,
-			isTopRightDown,
-			setBottomDown,
-			setBottomLeftDown,
-			setBottomRightDown,
-			setLeftDown,
-			setRightDown,
-			setTopDown,
-			setTopLeftDown,
-			setTopRightDown
-		} = useHandlesDown({
-			currentRotation,
-			initialPosition,
-			initialSize,
-			// limitBottom,
-			// limitLeft,
-			// limitRight,
-			// limitTop,
-			// limitTopLeft,
-			withCornerHandle,
-			withHandle
-		});
-		const handleMouse = useHandleMouse({
-			addGuides,
-			currentRotation,
-			currentSize,
-			guideRequests,
-			guides,
-			hideGuides,
-			initialPosition,
-			removeGuides,
-			shouldSnap,
-			showGuides,
-			updateGuide
-		});
-		const handleMouseEvent = useHandleMouseEvent({
-			additionalAngle,
-			contentRef,
-			initialRotation,
-			isRotatable
-		});
-		const {handleRotationDown, isDown, isRotationDown, setDown} = useWithDown({
-			handleMouse,
-			handleMouseEvent,
-			hideGuides,
-			scale,
-			setAdditionalAngle,
-			setInitialPosition,
-			setInitialRotation,
-			setPosition,
-			setRotation
-		});
-		const getCursorSlice = useCursorSlice(currentRotation);
-		const handles = useHandles({
-			setBottomDown,
-			setBottomLeftDown,
-			setBottomRightDown,
-			setLeftDown,
-			setRightDown,
-			setTopDown,
-			setTopLeftDown,
-			setTopRightDown
-		});
-		const wrapperStyle = {
-			...currentSize,
-			transform: `translate3d(${currentPosition.x}px, ${currentPosition.y}px, 0) translate3d(-50%, -50%, 0)`
-		};
-		const boxStyle = {
-			...getBoundingBox({
-				...currentSize,
-				angle: currentRotation.z
-			})
-		};
-		const contentStyle = {
-			...currentSize,
-			transform: `rotate3d(0, 0, 1, ${currentRotation.z}deg)`
-		};
-		useInitialSize({contentRef, setInitialSize, setSize});
-		listenRR({
-			currentPosition,
-			currentRotation,
-			currentSize,
-			handleDrag,
-			handleResize,
-			handleRotate,
-			isBottomDown,
-			isBottomLeftDown,
-			isBottomRightDown,
-			isDown,
-			isLeftDown,
-			isRightDown,
-			isRotationDown,
-			isTopDown,
-			isTopLeftDown,
-			isTopRightDown,
-			loaded
-		});
-		useDown({
-			handleDragEnd,
-			handleDragStart,
-			handleResizeEnd,
-			handleResizeStart,
-			handleRotateEnd,
-			handleRotateStart,
-			isBottomDown,
-			isBottomLeftDown,
-			isBottomRightDown,
-			isDown,
-			isLeftDown,
-			isRightDown,
-			isRotationDown,
-			isTopDown,
-			isTopLeftDown,
-			isTopRightDown,
-			loaded,
-			metaKey
-		});
-		useDrag({loaded, isDown, handleDragEnd, handleDragStart});
-		useLoaded(setLoaded);
-		return (
-			<Wrapper
-				ref={ref as React.Ref<HTMLElement>}
-				as={as}
-				style={{...(style || {}), ...wrapperStyle}}
-				isDown={isDown}
-				className={className}>
-				<BoundingBox style={boxStyle} draw={drawBoundingBox} />
-				<Content
-					ref={contentRef as React.Ref<HTMLDivElement>}
-					style={contentStyle}
-					onMouseDown={!metaKey && isDraggable ? setDown : undefined}>
-					{children}
-				</Content>
-				{(isResizable || isRotatable) && (
-					<PropProvider
-						value={{
-							getCursorSlice,
-							handleRotationDown,
-							isDraggable,
-							isResizable,
-							isRotatable,
-							metaKey
-						}}>
-						<Handles style={contentStyle} draw={drawBox}>
-							{handles.map(handle => {
-								return (
-									<Handle
-										key={handle.variation}
-										{...handle}
-										marker={marker}
-										full={fullHandles}
-									/>
-								);
-							})}
+	const boundingBox = useBoundingBox(snap.size, rotate);
+
+	return (
+		<Wrapper
+			as={as}
+			style={{
+				transform: `translate3d(${snap.position.x}px,${snap.position.y}px,0) translate3d(-50%,-50%, 0)`
+			}}>
+			<BoundingBox
+				drawOutline={drawBoundingBox}
+				style={boundingBox}
+				ref={rotateProps.ref as React.Ref<HTMLDivElement>}>
+				<Axis
+					style={{
+						transform: `translate3d(-50%,-50%, 0) rotate3d(0,0,1,${rotate}deg)`
+					}}>
+					{isResizable || isRotatable ? (
+						<Handles drawOutline={drawBox}>
+							{handleVariations.map(key => (
+								<Handle
+									key={key}
+									variation={key}
+									marker={marker}
+									fullSize={fullHandles}
+									onMouseDown={event => {
+										setDir(handleDirs[key]);
+										if ((isOSX() ? metaKey : controlKey) && isRotatable) {
+											rotateProps.onMouseDown(event);
+										} else if (isResizable) {
+											sizeProps.onMouseDown(event);
+										}
+									}}
+									onTouchStart={event => {
+										setDir(handleDirs[key]);
+										if (isResizable) {
+											sizeProps.onTouchStart(event);
+										}
+									}}
+								/>
+							))}
 						</Handles>
-					</PropProvider>
-				)}
-			</Wrapper>
-		);
-	}
-);
+					) : null}
+					<Content
+						style={{
+							...snap.size
+						}}
+						onMouseDown={isDraggable ? positionProps.onMouseDown : undefined}
+						onTouchStart={event => {
+							if (event.touches.length > 1) {
+								if (isRotatable) {
+									rotateProps.onTouchStart(event);
+								}
+							} else if (isDraggable) {
+								positionProps.onTouchStart(event);
+							}
+						}}>
+						{children}
+					</Content>
+				</Axis>
+			</BoundingBox>
+		</Wrapper>
+	);
+};
 
 Box.defaultProps = {
 	as: "div",
-	drawBoundingBox: false,
-	drawBox: true,
-	minHeight: 40,
-	minWidth: 40,
-	position: {
-		x: 0,
-		y: 0
-	},
-	rotation: {
-		x: 0,
-		y: 0,
-		z: 0
-	},
-	scale: 1,
-	shouldSnap: [],
-	size: {
-		height: "auto",
-		width: "auto"
-	}
+	marker: null
+};
+
+export const GuidedBox: React.FunctionComponent<Mops.BoxProps> = ({children, ...props}) => {
+	return (
+		<GuidesConsumer>
+			{context => (
+				<Box {...props} {...context}>
+					{children}
+				</Box>
+			)}
+		</GuidesConsumer>
+	);
 };

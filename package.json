@@ -13,7 +13,8 @@
     "ncu": "ncu - u; lerna exec 'ncu -u'",
     "prerelease": "lerna run build --scope react-mops",
     "release": "lerna publish --conventional-commits",
-    "release:next": "yarn prerelease && lerna publish --canary --preid next --pre-dist-tag next",
+    "release:beta": "yarn prerelease && lerna publish --dist-tag prerelease --preid beta",
+    "release:rc": "yarn prerelease && lerna publish --dist-tag prerelease --preid rc",
     "test": "echo 'No tests specified' exit 0"
   },
   "workspaces": [
